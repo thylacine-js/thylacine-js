@@ -12,7 +12,7 @@
   ],
   "exports": {
     ".": "./src/index.mjs",
-    "./*": "./src/*.mjs"
+    "./*": "./src/*"
   },
   "type": "module",
   "author": "",
