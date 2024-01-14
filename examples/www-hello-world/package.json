@@ -1,27 +1,17 @@
 {
-  "name": "@thylacine-js/webapp",
+  "name": "www-hello-world",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "files": [
-    "src",
-    "src/*"
-  ],
-  "exports": {
-    ".": "./src/index.mjs",
-    "./*": "./src/*"
-  },
   "scripts": {
+    "start": "node index.mjs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "chokidar": "^3.5.3",
-    "esbuild": "^0.19.11",
-    "fs-extra": "^11.2.0",
-    "globby": "^14.0.0",
-    "lodash": "^4.17.21",
+    "@thylacine-js/utils": "workspace:^1.0.0",
+    "@thylacine-js/webapp": "workspace:^1.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.21.2"
