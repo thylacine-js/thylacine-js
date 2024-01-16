@@ -1,7 +1,8 @@
 import bodyParser from "body-parser";
+import { IncomingMessage } from 'http';
 
 let bufferRawBody = bodyParser.raw({
-  verify: function (req, res, buf, encoding) {
+  verify: function (req : IncomingMessage & {rawBody?: string}, res, buf, encoding? : BufferEncoding) {
     if (buf && buf.length) {
       req.rawBody = buf.toString(encoding || "utf8");
     }

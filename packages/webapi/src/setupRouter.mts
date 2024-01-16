@@ -1,7 +1,12 @@
 import catchAsyncErrors from "./catchAsyncErrors.mjs";
-import { globby } from "globby";
 
-function appHandle(app, method, path, handler, ...middleware) {
+import  { Express }  from 'express';
+import expressWs, { Application, WithWebsocketMethod } from 'express-ws';
+import { globby } from 'globby';
+
+
+
+function appHandle(app : Express, method: keyof typeof Verbs, path: string, handler: (...args: any[]) => any, ...middleware: any[]) {
   app[method](
     path,
     (req, res, next) => {
@@ -13,10 +18,26 @@ function appHandle(app, method, path, handler, ...middleware) {
   );
 }
 
-const HTTP_VERBS = ["get", "post", "put", "delete", "patch", "all", "ws"];
+enum Verbs
+{
+  get = 'get',
+  post = 'post',
+  put = 'put',
+  delete = 'delete',
+  patch = 'patch',
+  all = 'all',
+  ws = 'ws'
 
-async function findRoutes(appDir) {
-  const r = [];
+}
+
+const HTTP_VERBS = Object.values(Verbs);
+
+
+
+async function findRoutes(appDir: string) : Promise<any[][]> {
+
+
+  const r : any[][] = [];
   const path_matchers = HTTP_VERBS.map(
     (verb) => `${appDir}/routes/**/${verb}.mjs`
   );
@@ -30,7 +51,7 @@ async function findRoutes(appDir) {
   return r;
 }
 
-export default async function setupRouter(app, { appDir = process.cwd() } = {}) {
+export default async function setupRouter(app : Express & { ws?: WithWebsocketMethod["ws"]}, { appDir = process.cwd() } = {}) {
   const routes = await findRoutes(appDir);
   for (const route of routes) {
     const [method, path] = route;
@@ -38,8 +59,9 @@ export default async function setupRouter(app, { appDir = process.cwd() } = {}) 
       `${appDir}/routes${path}${
         path.length === 1 ? "" : "/"
       }${method}.mjs`
-    );
-    if (method === "ws") {
+    )
+
+    if (method === Verbs.ws && app.ws)  {
       app.ws(path, module.default);
     } else {
       const handler = catchAsyncErrors(module.default);
