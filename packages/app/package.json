@@ -1,6 +1,6 @@
 {
-  "name": "@thylacine-js/webapp",
-  "version": "1.0.0",
+  "name": "@thylacine-js/app",
+  "version": "1.1.0-beta.1",
   "description": "",
   "main": "index.js",
   "files": [
