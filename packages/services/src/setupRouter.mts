@@ -1,12 +1,13 @@
 import catchAsyncErrors from "./catchAsyncErrors.mjs";
 
-import  { Express }  from 'express';
+import  { Express, IRouter, RequestHandler }  from 'express';
 import expressWs, { Application, WithWebsocketMethod } from 'express-ws';
 import { globby } from 'globby';
+import { METHODS } from 'http';
 
 
 
-function appHandle(app : Express, method: keyof typeof Verbs, path: string, handler: (...args: any[]) => any, ...middleware: any[]) {
+function appHandle(app : IRouter, method: Method, path: string, handler: RequestHandler, ...middleware: RequestHandler[]) {
   app[method](
     path,
     (req, res, next) => {
@@ -18,19 +19,9 @@ function appHandle(app : Express, method: keyof typeof Verbs, path: string, hand
   );
 }
 
-enum Verbs
-{
-  get = 'get',
-  post = 'post',
-  put = 'put',
-  delete = 'delete',
-  patch = 'patch',
-  all = 'all',
-  ws = 'ws'
+type Method =  'get' | 'post' | 'put' | 'delete' | 'patch' | 'all' | 'ws';
 
-}
-
-const HTTP_VERBS = Object.values(Verbs);
+const HTTP_VERBS = METHODS.concat("ws");
 
 
 
@@ -39,7 +30,7 @@ async function findRoutes(appDir: string) : Promise<any[][]> {
 
   const r : any[][] = [];
   const path_matchers = HTTP_VERBS.map(
-    (verb) => `${appDir}/routes/**/${verb}.mjs`
+    (verb) => `${appDir}/routes/**/${verb.toLowerCase()}.mjs`
   );
   const paths = await globby(path_matchers);
   for (const path of paths) {
@@ -51,7 +42,7 @@ async function findRoutes(appDir: string) : Promise<any[][]> {
   return r;
 }
 
-export default async function setupRouter(app : Express & { ws?: WithWebsocketMethod["ws"]}, { appDir = process.cwd() } = {}) {
+export default async function setupRouter(app : Express & {ws? : expressWs.WebsocketMethod<any>}, { appDir = process.cwd() } = {}) {
   const routes = await findRoutes(appDir);
   for (const route of routes) {
     const [method, path] = route;
@@ -60,12 +51,19 @@ export default async function setupRouter(app : Express & { ws?: WithWebsocketMe
         path.length === 1 ? "" : "/"
       }${method}.mjs`
     )
+    const middleware = module.middleware || [];
 
-    if (method === Verbs.ws && app.ws)  {
-      app.ws(path, module.default);
+    if (method === 'ws')  {
+      if(app.ws)
+      {
+          expressWs(app);
+          //TODO: pass WebSocket options
+      }
+      app.ws(path, ...middleware,module.default);
     } else {
       const handler = catchAsyncErrors(module.default);
-      const middleware = module.middleware || [];
+
+
       appHandle(app, method, path, handler, ...middleware);
     }
   }

@@ -53,7 +53,7 @@ export default async function setupServer({ appDir = process.cwd() } = {}) {
       maxAge: null as any
     })
   );
-  expressWs(app);
+  //expressWs(app);
   await setupRouter(app, {appDir});
   app.use((err: { message: any; }, req: any, res: { json: (arg0: { ok: boolean; error: any; }) => void; }, next: any) => {
     res.json({
