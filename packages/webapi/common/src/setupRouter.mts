@@ -1,13 +1,13 @@
 import catchAsyncErrors from "./catchAsyncErrors.mjs";
 
-import  { Express, IRouter, RequestHandler }  from 'express';
+import  { Express, IRouter, RequestHandler, application }  from 'express';
 import expressWs, { Application, WithWebsocketMethod } from 'express-ws';
 import { globby } from 'globby';
 import { METHODS } from 'http';
 
 
 
-function appHandle(app : IRouter, method: Method, path: string, handler: RequestHandler, ...middleware: RequestHandler[]) {
+function appHandle(app : IRouter, method: CanonicalMethod | T extends CanonicalMethod, path: string, handler: RequestHandler, ...middleware: RequestHandler[]) {
   app[method](
     path,
     (req, res, next) => {
@@ -17,9 +17,10 @@ function appHandle(app : IRouter, method: Method, path: string, handler: Request
     ...middleware,
     handler
   );
+
 }
 
-type Method =  'get' | 'post' | 'put' | 'delete' | 'patch' | 'all' | 'ws';
+type CanonicalMethod<T> =  'get' | 'post' | 'put' | 'delete' | 'patch' | 'all' | 'ws' | T extends Methods;
 
 const HTTP_VERBS = METHODS.concat("ws");
 
@@ -51,10 +52,11 @@ export default async function setupRouter(app : Express & {ws? : expressWs.Webso
         path.length === 1 ? "" : "/"
       }${method}.mjs`
     )
+
     const middleware = module.middleware || [];
 
     if (method === 'ws')  {
-      if(app.ws)
+      if(!app.ws)
       {
           expressWs(app);
           //TODO: pass WebSocket options

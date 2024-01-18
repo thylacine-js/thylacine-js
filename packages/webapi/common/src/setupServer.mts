@@ -1,8 +1,7 @@
-import express, {Express} from "express";
-import expressWs, { Application } from "express-ws";
 import cookie_parser from "cookie-parser";
 import cookie_session from "cookie-session";
 import cors from "cors";
+import express, { Express } from "express";
 
 import setupRouter from "./setupRouter.mjs";
 
