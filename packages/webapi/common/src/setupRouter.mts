@@ -7,7 +7,7 @@ import { METHODS } from 'http';
 
 
 
-function appHandle(app : IRouter, method: CanonicalMethod | T extends CanonicalMethod, path: string, handler: RequestHandler, ...middleware: RequestHandler[]) {
+function appHandle(app : IRouter, method: CanonicalMethod, path: string, handler: RequestHandler, ...middleware: RequestHandler[]) {
   app[method](
     path,
     (req, res, next) => {
@@ -20,7 +20,7 @@ function appHandle(app : IRouter, method: CanonicalMethod | T extends CanonicalM
 
 }
 
-type CanonicalMethod<T> =  'get' | 'post' | 'put' | 'delete' | 'patch' | 'all' | 'ws' | T extends Methods;
+type CanonicalMethod =  'get' | 'post' | 'put' | 'delete' | 'patch' | 'all' | 'ws';
 
 const HTTP_VERBS = METHODS.concat("ws");
 
@@ -64,8 +64,6 @@ export default async function setupRouter(app : Express & {ws? : expressWs.Webso
       app.ws(path, ...middleware,module.default);
     } else {
       const handler = catchAsyncErrors(module.default);
-
-
       appHandle(app, method, path, handler, ...middleware);
     }
   }

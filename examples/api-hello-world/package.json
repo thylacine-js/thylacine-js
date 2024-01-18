@@ -11,6 +11,6 @@
   "license": "ISC",
   "dependencies": {
     "@thylacine-js/utils": "workspace:^1.0.0",
-    "@thylacine-js/webapi": "workspace:^1.0.0"
+    "@thylacine-js/webapi-common": "workspace:^1.0.0"
   }
 }

@@ -1,11 +1,11 @@
 {
     "author": "",
-    "description": "",
+    "description": "Thylacine Web API Framework",
     "license": "ISC",
     "main": "dist/index.mjs",
-    "name": "@thylacine-js/services",
+    "name": "@thylacine-js/webapi-common",
     "type": "module",
-    "version": "1.1.0-beta.1",
+    "version": "1.0.0",
     "dependencies": {
         "body-parser": "^1.20.2",
         "cookie-parser": "^1.4.6",

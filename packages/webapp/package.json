@@ -1,7 +1,7 @@
 {
-  "name": "@thylacine-js/app",
-  "version": "1.1.0-beta.1",
-  "description": "",
+  "name": "@thylacine-js/webapp",
+  "version": "1.0.0",
+  "description": "Thylacine Web App Framework",
   "main": "index.js",
   "files": [
     "src",
