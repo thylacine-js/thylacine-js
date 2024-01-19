@@ -1,5 +1,5 @@
-import setupEnv from '@thylacine-js/utils/setupEnv.mjs';
-import setupServer from '@thylacine-js/webapi/setupServer.mjs';
+import setupEnv from '@thylacine-js/common/setupEnv.mjs';
+import setupServer from '@thylacine-js/webapi-express/setupServer.mjs';
 
 setupEnv();
 const server = await setupServer();

@@ -1,4 +1,4 @@
-import parseMultipartBody from "@thylacine-js/webapi/middleware/parseMultipartBody.mjs";
+import parseMultipartBody from "@thylacine-js/webapi-express/middleware/parseMultipartBody.mjs"
 
 export const middleware = [parseMultipartBody];
 

@@ -1,16 +1,21 @@
 import catchAsyncErrors from "./catchAsyncErrors.mjs";
 
-import  { Express, IRouter, RequestHandler, application }  from 'express';
+import type { Express, IRouter, RequestHandler, Request as Req, Response as Resp, NextFunction }  from 'express';
 import expressWs, { Application, WithWebsocketMethod } from 'express-ws';
 import { globby } from 'globby';
 import { METHODS } from 'http';
+import {WeakExtensible} from '@thylacine-js/common/extensible.mjs';
+
+type Request = WeakExtensible<Req>
+type Response = WeakExtensible<Resp>
 
 
 
-function appHandle(app : IRouter, method: CanonicalMethod, path: string, handler: RequestHandler, ...middleware: RequestHandler[]) {
+
+function addHandler(app : IRouter, method: CanonicalMethod, path: string, handler: RequestHandler, ...middleware: RequestHandler[]) {
   app[method](
     path,
-    (req, res, next) => {
+    (req : Request, res : Response, next: NextFunction) => {
       res.jsonCached = res.json;
       next();
     },
@@ -27,8 +32,6 @@ const HTTP_VERBS = METHODS.concat("ws");
 
 
 async function findRoutes(appDir: string) : Promise<any[][]> {
-
-
   const r : any[][] = [];
   const path_matchers = HTTP_VERBS.map(
     (verb) => `${appDir}/routes/**/${verb.toLowerCase()}.mjs`
@@ -53,6 +56,7 @@ export default async function setupRouter(app : Express & {ws? : expressWs.Webso
       }${method}.mjs`
     )
 
+
     const middleware = module.middleware || [];
 
     if (method === 'ws')  {
@@ -64,7 +68,7 @@ export default async function setupRouter(app : Express & {ws? : expressWs.Webso
       app.ws(path, ...middleware,module.default);
     } else {
       const handler = catchAsyncErrors(module.default);
-      appHandle(app, method, path, handler, ...middleware);
+      addHandler(app, method, path, handler, ...middleware);
     }
   }
 }

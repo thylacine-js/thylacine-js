@@ -1,5 +1,5 @@
 {
-  "name": "@thylacine-js/utils",
+  "name": "@thylacine-js/common",
   "version": "1.0.0",
   "description": "utils from an extinct web framework",
   "main": "index.js",
@@ -7,12 +7,12 @@
     "test": "echo \"Error: no test specified\""
   },
   "files": [
-    "src",
-    "src/*"
+    "dist",
+    "dist/*"
   ],
   "exports": {
-    ".": "./src/index.mjs",
-    "./*": "./src/*"
+    ".": "./dist/index.mjs",
+    "./*": "./dist/*"
   },
   "type": "module",
   "author": "",

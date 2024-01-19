@@ -1,12 +1,15 @@
 import cookie_parser from "cookie-parser";
 import cookie_session from "cookie-session";
 import cors from "cors";
-import express, { Express } from "express";
+import express, { Application, Express, RequestHandler, Request, Response, NextFunction } from "express";
 
-import setupRouter from "./setupRouter.mjs";
+import setupRouter from "@thylacine-js/webapi-common/setupRouter.mjs"
+
+
 
 export default async function setupServer({ appDir = process.cwd() } = {}) {
   const app : Express & {ws?: any} = express();
+
   app.use((req, res, next) => {
     // TODO better default logging
     console.log(`${req.method} ${req.path}`);
@@ -54,7 +57,7 @@ export default async function setupServer({ appDir = process.cwd() } = {}) {
   );
   //expressWs(app);
   await setupRouter(app, {appDir});
-  app.use((err: { message: any; }, req: any, res: { json: (arg0: { ok: boolean; error: any; }) => void; }, next: any) => {
+  app.use((err: { message: any; }, req: Request, res: Response, next: NextFunction) => {
     res.json({
       ok: false,
       error: err?.message,
