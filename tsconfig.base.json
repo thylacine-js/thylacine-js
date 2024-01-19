@@ -3,6 +3,7 @@
 		"target": "ES2022" ,
 		"module": "Node16" ,
 		"rootDir": "./src",
+		"allowJs": true,
 		"allowSyntheticDefaultImports": true,
 		"declaration": true,
 		"outDir": "./dist",

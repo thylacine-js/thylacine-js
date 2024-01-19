@@ -4,7 +4,8 @@
   "description": "utils from an extinct web framework",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\""
+    "test": "echo \"Error: no test specified\"",
+    "preinstall": "tsc"
   },
   "files": [
     "dist",
