@@ -3,10 +3,11 @@ import { createBrowserRouter, Outlet, ScrollRestoration } from "react-router-dom
 
 import useHMR from './useHMR.mjs';
 
+
 function App(){
   useHMR();
   return React.createElement(
-    'div', 
+    'div',
     { className: 'App' },
     React.createElement(Outlet, null),
     React.createElement(ScrollRestoration, null)
@@ -35,7 +36,8 @@ function addRoutes(acc, level, layouts) {
   return acc;
 }
 
-export default function createRouter(routes_list) {
+
+export default function createRouter(routes_list) : any {
   let nested_routes = {routes: []};
   for (const route of routes_list) {
     if (route.path) {
@@ -55,14 +57,13 @@ export default function createRouter(routes_list) {
       }
     }
   }
-  const layouts = routes_list.filter(i => !i.path); 
+  const layouts = routes_list.filter(i => !i.path);
 
   const routes = addRoutes([], nested_routes, layouts);
 
-  const router = createBrowserRouter([{
+  return createBrowserRouter([{
     element: React.createElement(App),
     children: routes
   }]);
 
-  return router;
 }

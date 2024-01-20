@@ -11,6 +11,7 @@ const catchAsyncErrors =
         const r = fn(req, res, next);
         if (isPromise(r)) {
           r.catch(next);
+          
         } else {
           return r;
         }

@@ -7,8 +7,9 @@ import esbuildOnEndBuild from "./esbuildOnEndBuild.mjs";
 import findRouteFiles from "./findRouteFiles.mjs";
 import findLayoutFiles from "./findLayoutFiles.mjs";
 import createRoutesInjection from "./createRoutesInjection.mjs";
+import { BuildOptions } from 'esbuild';
 
-export default function createConfig({ appDir = process.cwd() } = {}) {
+export default function createConfig({ appDir = process.cwd() } = {}) : BuildOptions {
   const allowedEnvVars = [
     "NODE_ENV",
     "WWW_ORIGIN",

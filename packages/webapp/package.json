@@ -4,15 +4,16 @@
   "description": "Thylacine Web App Framework",
   "main": "index.js",
   "files": [
-    "src",
-    "src/*"
+    "dist",
+    "dist/*"
   ],
   "exports": {
-    ".": "./src/index.mjs",
-    "./*": "./src/*"
+    ".": "./dist/index.mjs",
+    "./*": "./dist/*"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "preinstall": "tsc"
   },
   "author": "",
   "license": "ISC",
@@ -25,5 +26,12 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.21.2"
+  },
+  "devDependencies": {
+      "@types/react": "^18.2.0",
+      "@types/react-dom": "^18.0.11",
+      "@types/react-router-dom": "^5.3.2",
+
+      "@types/node": ""
   }
 }
