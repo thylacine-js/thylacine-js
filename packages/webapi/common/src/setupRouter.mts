@@ -1,5 +1,5 @@
 import catchAsyncErrors from "./catchAsyncErrors.mjs";
-
+import fs from 'fs';
 import type { Express, IRouter, RequestHandler, Request as Req, Response as Resp, NextFunction } from 'express';
 import expressWs, { Application, WebsocketRequestHandler, WithWebsocketMethod } from 'express-ws';
 import { globby } from 'globby';
@@ -8,10 +8,11 @@ import { WeakExtensible } from '@thylacine-js/common/extensible.mjs';
 import { Config } from './config.mjs';
 import { ApiRoute, CanonicalMethod, HttpMethod } from './apiRoute.mjs';
 
+import ts from 'typescript';
+
 
 type Request = WeakExtensible<Req>;
 type Response = WeakExtensible<Resp>;
-
 
 
 
@@ -65,4 +66,70 @@ export default async function setupRouter(app: Express & { ws?: expressWs.Websoc
       }
     }
   }
+  exportClientApi(app, routes);
+}
+export async function exportClientApi(app: Express, routes: ApiRoute<RequestHandler | WebsocketRequestHandler>[]) {
+  let methods = [];
+  let sourceFile = ts.createSourceFile("client.ts", "", ts.ScriptTarget.ESNext, false, ts.ScriptKind.TS);
+
+  let factory = ts.factory;
+  //@ts-expect-error
+  sourceFile.statements = [
+    factory.createClassDeclaration(
+      [factory.createToken(ts.SyntaxKind.ExportKeyword)],
+      factory.createIdentifier("Client"),
+      undefined,
+      undefined,
+      [
+        factory.createPropertyDeclaration(
+          [
+            factory.createToken(ts.SyntaxKind.PublicKeyword),
+            factory.createToken(ts.SyntaxKind.ReadonlyKeyword)
+          ],
+          factory.createIdentifier("baseURL"),
+          undefined,
+          factory.createTypeReferenceNode(
+            factory.createIdentifier("URL"),
+            undefined
+          ),
+          undefined
+        ),
+        factory.createConstructorDeclaration(
+          undefined,
+          [factory.createParameterDeclaration(
+            undefined,
+            undefined,
+            factory.createIdentifier("url"),
+            undefined,
+            factory.createUnionTypeNode([
+              factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+              factory.createTypeReferenceNode(
+                factory.createIdentifier("URL"),
+                undefined
+              )
+            ]),
+            undefined
+          )],
+          factory.createBlock(
+            [factory.createExpressionStatement(factory.createBinaryExpression(
+              factory.createPropertyAccessExpression(
+                factory.createThis(),
+                factory.createIdentifier("baseURL")
+              ),
+              factory.createToken(ts.SyntaxKind.EqualsToken),
+              factory.createNewExpression(
+                factory.createIdentifier("URL"),
+                undefined,
+                [factory.createIdentifier("url")]
+              )
+            ))],
+            true
+          )
+        ),
+        ...routes.map(p => p.createMethodDeclaration())
+      ]
+    )];
+  const printer = ts.createPrinter();
+  fs.writeFileSync('./apiClient.ts',printer.printFile(sourceFile));
+
 }
