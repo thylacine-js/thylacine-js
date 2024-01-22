@@ -7,7 +7,11 @@ export class Config
           }
 
     public static get LAZY_LOAD() : boolean {
-        return Boolean(process.env.LAZY_LOAD ?? true);
+        return Boolean(process.env.LAZY_LOAD ?? false);
+    }
+    static _HOT_RELOAD : boolean;
+    public static get HOT_RELOAD() : boolean {
+        return this._HOT_RELOAD ?? (this._HOT_RELOAD = Boolean(process.env.HOT_RELOAD ?? process.env.NODE_ENV === "development"));
     }
 
 }

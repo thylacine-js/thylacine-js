@@ -1,10 +1,14 @@
-import { RequestHandler } from 'express';
+import { RequestHandler, Request } from 'express';
 
 import { Config, appendToStartIfAbsent } from './config.mjs';
 import { WebsocketRequestHandler } from 'express-ws';
 import { Extensible } from '@thylacine-js/common/extensible.mjs';
-import ts, { MethodDeclaration } from 'typescript';
+import ts, { ClassElement, Declaration, MethodDeclaration, Statement, readConfigFile } from 'typescript';
 import camelCase from 'lodash/camelCase.js';
+import { Dirent, readdirSync } from 'node:fs';
+import nodePath from 'node:path';
+import { FileWatcher } from 'typescript';
+
 
 export const enum CanonicalMethod {
 
@@ -13,42 +17,143 @@ export const enum CanonicalMethod {
     put = 'put',
     delete = 'delete',
     patch = 'patch',
+    options = 'options',
+    head = 'head',
     all = 'all',
-    ws = 'ws'
+    ws = 'ws',
+    trace = 'trace'
 }
+
+
 
 export type HttpMethod = Extensible<CanonicalMethod, string>;
 
 const PathExp = new RegExp(`(.*)${Config.ROUTE_ROOT}(.*)/(.*).mjs`);
+
+
+export class RouteNode {
+    public readonly path: string;
+    public readonly children: Map<string, RouteNode | ApiRoute<any>> = new Map();
+
+    public readonly parent: RouteNode;
+
+    public constructor (path: string, parent:RouteNode = null) {
+        this.path = path;
+        this.parent = parent;
+    }
+
+    static async create(path: string, baseDirectory: string, parent: RouteNode = null): Promise<RouteNode | ApiRoute<RequestHandler | WebsocketRequestHandler> | void> {
+
+
+        let entries = readdirSync(nodePath.join(baseDirectory, path), { withFileTypes: true }) as Dirent[];
+        console.log(`Path ${path} with baseDirectory ${baseDirectory} has ${entries.length} entries.`);
+        if (entries.length === 1) {
+            const dirent = entries[0];
+            if (dirent.isFile() && entries[0].name.endsWith(".mjs")) {
+                return await ApiRoute.create(nodePath.join(dirent.path, dirent.name), parent);
+            }
+            else if (entries[0].isDirectory()) {
+                return await RouteNode.create(nodePath.join(path, dirent.name), baseDirectory, parent);
+            }
+        }
+        else if (entries.length === 0) {   /*Don't create a node for an empty directory*/ }
+        else {
+            let node = new RouteNode(path,parent);
+
+            for (const dirent of entries) {
+
+                if (dirent.isDirectory()) {
+                    let childNode = await RouteNode.create(nodePath.join(path, dirent.name), baseDirectory, node);
+                    if (childNode) {
+                        node.children.set(childNode.path, childNode);
+
+                    }
+                }
+                else if (dirent.isFile() && dirent.name.endsWith(".mjs")) {
+                    node.children.set(dirent.name, await ApiRoute.create(nodePath.join(dirent.path, dirent.name), node));
+                }
+
+
+            }
+            return node;
+        }
+
+    }
+
+    public createDeclaration(): ClassElement[] {
+        return Array.from(this.children.values()).flatMap(p => p.createDeclaration());
+    }
+}
+
+
+
 export class ApiRoute<THandler extends RequestHandler | WebsocketRequestHandler>
 {
     public readonly method: HttpMethod;
-    public readonly path : string;
+    public readonly path: string;
 
-    public readonly fullPath : string;
+    public readonly filePath: string;
+d
 
-    public readonly handler : THandler;
+    public handler: THandler;
 
-    public readonly middleware : THandler[];
+    public readonly middleware: THandler[];
 
-     stringify() : string
-    {
-        return JSON.stringify({method:this.method,path:this.path,fullPath:this.fullPath,handler:this.handler.name,middleware:this.middleware.map(m=>m.name)});
+    static routeMap = new Map<string, RequestHandler | WebsocketRequestHandler>();
+
+    public operation: string;
+    parent: RouteNode;
+
+    stringify(): string {
+        return JSON.stringify({ method: this.method, path: this.path, fullPath: this.filePath, handler: this.handler.name, middleware: this.middleware.map(m => m.name) });
     }
-    public static async create(path : string) : Promise<ApiRoute<RequestHandler | WebsocketRequestHandler>>
-    {
+    public static async create(path: string, parent: RouteNode): Promise<ApiRoute<RequestHandler | WebsocketRequestHandler>> {
         const m = path.match(PathExp);
         if (m) {
-            let module = (await import(path));
-            let handler = module.default;
-            let middleware = module.middleware || [];
+
+            let handler = null;
+            let middleware = [];
             let method = m[3].toLowerCase() as HttpMethod;
-            let route = appendToStartIfAbsent(m[2],"/");
+            let route = appendToStartIfAbsent(m[2], "/");
             let r = null;
-            if(method === CanonicalMethod.ws)
-                r = new ApiRoute<WebsocketRequestHandler>(method,route,path,handler,middleware);
+
+            if (!Config.LAZY_LOAD && !Config.HOT_RELOAD)
+            {
+                let module = await import(path);
+                handler = module.default;
+                middleware = module.middleware || [];
+
+            }
+            else {
+                handler = async (res: Request, req, next) => {
+                    let actHandler = this.routeMap.get(res.path) as RequestHandler;
+                    if (actHandler)
+                        return actHandler(res, req, next);
+                    else {
+                        let module = await import(path);
+                        if (module.default)
+                            actHandler = module.default;
+                        this.routeMap[res.path] = actHandler;
+                        return actHandler(res, req, next);
+
+                    }
+
+                };
+            }
+            if (Config.HOT_RELOAD) {
+                let module = await import(path);
+
+                this.routeMap[path] = module.default;
+                middleware = module.middleware || [];
+
+            }
+            if (method !== CanonicalMethod.ws) {
+                r = new ApiRoute<RequestHandler>(method, route, path, handler, middleware, parent);
+            }
             else
-                r = new ApiRoute<RequestHandler>(method,route,path,handler,middleware);
+                r = new ApiRoute<WebsocketRequestHandler>(method, route, path, handler, middleware, parent);
+
+
 
             console.log(r.stringify());
             return r;
@@ -57,20 +162,19 @@ export class ApiRoute<THandler extends RequestHandler | WebsocketRequestHandler>
         throw new Error(`Invalid path ${path}`);
     }
 
-    private constructor(method: HttpMethod, route: string, path : string, handler : THandler, middleware : THandler[])
-    {
+    private constructor (method: HttpMethod, route: string, path: string, handler: THandler, middleware: THandler[], parent: RouteNode) {
 
-            this.fullPath = path;
-            this.path = route;
-            this.method = method;
-            this.handler = handler;
-            this.middleware = middleware;
+        this.filePath = path;
+        this.path = route;
+        this.method = method;
+        this.handler = handler;
+        this.middleware = middleware;
+        this.parent = parent;
 
     }
 
 
-    public createMethodDeclaration() : MethodDeclaration
-    {
+    public createDeclaration(): MethodDeclaration {
         let factory = ts.factory;
         return factory.createMethodDeclaration(
             [
@@ -78,7 +182,7 @@ export class ApiRoute<THandler extends RequestHandler | WebsocketRequestHandler>
                 factory.createToken(ts.SyntaxKind.AsyncKeyword)
             ],
             undefined,
-            factory.createIdentifier(camelCase(`${this.method}_${this.path}`)),
+            factory.createIdentifier(this.handler.name !== "default" ? this.handler.name : camelCase(`${this.method}_${this.path}`)),
             undefined,
             undefined,
             [factory.createParameterDeclaration(
@@ -137,7 +241,7 @@ export class ApiRoute<THandler extends RequestHandler | WebsocketRequestHandler>
                 ],
                 true
             )
-        )
+        );
 
 
     }

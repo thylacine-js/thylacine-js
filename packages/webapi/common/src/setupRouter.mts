@@ -2,13 +2,13 @@ import catchAsyncErrors from "./catchAsyncErrors.mjs";
 import fs from 'fs';
 import type { Express, IRouter, RequestHandler, Request as Req, Response as Resp, NextFunction } from 'express';
 import expressWs, { Application, WebsocketRequestHandler, WithWebsocketMethod } from 'express-ws';
-import { globby } from 'globby';
 import { METHODS } from 'http';
 import { WeakExtensible } from '@thylacine-js/common/extensible.mjs';
-import { Config } from './config.mjs';
-import { ApiRoute, CanonicalMethod, HttpMethod } from './apiRoute.mjs';
+import { ApiRoute, CanonicalMethod, HttpMethod, RouteNode } from './apiRoute.mjs';
 
 import ts from 'typescript';
+
+import nodePath from 'path';
 
 
 type Request = WeakExtensible<Req>;
@@ -30,45 +30,45 @@ function addHandler(app: IRouter, method: HttpMethod, path: string, handler: Req
 
 }
 
+export async function addHandlersFrom(app: Express & { ws?: expressWs.WebsocketMethod<any>; }, node: RouteNode) {
 
-
-const HTTP_VERBS = METHODS.concat("ws");
-
-
-
-async function findRoutes(appDir: string): Promise<ApiRoute<RequestHandler | WebsocketRequestHandler>[]> {
-  const r = [];
-  const path_matchers = HTTP_VERBS.map(
-    (verb) => `${appDir}/${Config.ROUTE_ROOT}/**/${verb.toLowerCase()}.mjs`
-  );
-  const paths = await globby(path_matchers);
-  for (const path of paths) {
-
-    r.push(await ApiRoute.create(path));
-  }
-  return r;
-}
-
-export default async function setupRouter(app: Express & { ws?: expressWs.WebsocketMethod<any>; }, { appDir = process.cwd() } = {}) {
-  const routes = await findRoutes(appDir);
-  for (const route of routes) {
+  if(node)
+  {
+  for (const route of node.children.values()) {
     {
-      if (route.method === CanonicalMethod.ws) {
+      if (route instanceof RouteNode) {
+        await addHandlersFrom(app, route);
+      }
+      else if (route instanceof ApiRoute) {
 
-        if (!app.ws) {
-          expressWs(app);
-          //TODO: pass WebSocket options
+        if (route.method === CanonicalMethod.ws) {
+
+          if (!app.ws) {
+            expressWs(app);
+            //TODO: pass WebSocket options
+          }
+          app.ws(route.path, ...route.middleware as WebsocketRequestHandler[], route.handler as WebsocketRequestHandler);
+        } else {
+          const handler = catchAsyncErrors(route.handler as RequestHandler);
+          addHandler(app, route.method, route.path, handler, ...route.middleware as RequestHandler[]);
         }
-        app.ws(route.path, ...route.middleware as WebsocketRequestHandler[], route.handler as WebsocketRequestHandler);
-      } else {
-        const handler = catchAsyncErrors(route.handler as RequestHandler);
-        addHandler(app, route.method, route.path, handler, ...route.middleware as RequestHandler[]);
       }
     }
   }
-  exportClientApi(app, routes);
+
+  }
 }
-export async function exportClientApi(app: Express, routes: ApiRoute<RequestHandler | WebsocketRequestHandler>[]) {
+
+
+export const HTTP_VERBS = METHODS.concat("ws");
+
+export default async function setupRouter(app: Express & { ws?: expressWs.WebsocketMethod<any>; }, { appDir = process.cwd() } = {}) {
+  const tree = await RouteNode.create("/", nodePath.join(appDir, "routes")) as RouteNode;
+  await addHandlersFrom(app, tree);
+
+  await exportClientApi(app, tree);
+}
+export async function exportClientApi(app: Express, tree: RouteNode) {
   let methods = [];
   let sourceFile = ts.createSourceFile("client.ts", "", ts.ScriptTarget.ESNext, false, ts.ScriptKind.TS);
 
@@ -126,10 +126,10 @@ export async function exportClientApi(app: Express, routes: ApiRoute<RequestHand
             true
           )
         ),
-        ...routes.map(p => p.createMethodDeclaration())
+        ...tree.createDeclaration()
       ]
     )];
   const printer = ts.createPrinter();
-  fs.writeFileSync('./apiClient.ts',printer.printFile(sourceFile));
+  fs.writeFileSync('./apiClient.ts', printer.printFile(sourceFile));
 
 }

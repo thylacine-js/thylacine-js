@@ -7,16 +7,24 @@ export class Client {
         let r = await fetch(new URL("/", this.baseURL), { method: "GET" });
         return r;
     }
-    public async postLogin(...args): Promise<Response> {
-        let r = await fetch(new URL("/login", this.baseURL), { method: "POST" });
+    public async postLoginWithPassword(...args): Promise<Response> {
+        let r = await fetch(new URL("/login/withPassword", this.baseURL), { method: "POST" });
         return r;
     }
-    public async wsWs(...args): Promise<Response> {
-        let r = await fetch(new URL("/ws", this.baseURL), { method: "WS" });
+    public async postLoginWithToken(...args): Promise<Response> {
+        let r = await fetch(new URL("/login/withToken", this.baseURL), { method: "POST" });
+        return r;
+    }
+    public async allLogout(...args): Promise<Response> {
+        let r = await fetch(new URL("/logout", this.baseURL), { method: "ALL" });
         return r;
     }
     public async getSession(...args): Promise<Response> {
         let r = await fetch(new URL("/session", this.baseURL), { method: "GET" });
+        return r;
+    }
+    public async wsWs(...args): Promise<Response> {
+        let r = await fetch(new URL("/ws", this.baseURL), { method: "WS" });
         return r;
     }
 }

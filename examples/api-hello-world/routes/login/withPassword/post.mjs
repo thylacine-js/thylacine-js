@@ -2,7 +2,7 @@ import parseMultipartBody from "@thylacine-js/webapi-express/middleware/parseMul
 
 export const middleware = [parseMultipartBody];
 
-export default async function (req, res) {
+export default async function loginWithPassword(req, res) {
   const { username, password } = req.body || {};
   if (username === "demo" && password === "d3m0") {
     const user = { id: 1, username: "demo" };
