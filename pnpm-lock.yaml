@@ -11,6 +11,9 @@ importers:
       '@thylacine-js/common':
         specifier: workspace:^1.0.0
         version: link:../../packages/common
+      '@thylacine-js/webapi-client':
+        specifier: workspace:^1.0.0
+        version: link:../../packages/webapi/client
       '@thylacine-js/webapi-express':
         specifier: workspace:^1.0.0
         version: link:../../packages/webapi/platforms/express
@@ -41,6 +44,18 @@ importers:
       dotenv-expand:
         specifier: ^10.0.0
         version: 10.0.0
+
+  packages/webapi/client:
+    dependencies:
+      '@thylacine-js/common':
+        specifier: workspace:^1.0.0
+        version: link:../../common
+      '@thylacine-js/webapi-common':
+        specifier: workspace:^1.0.0
+        version: link:../common
+      typescript:
+        specifier: 5.3.3
+        version: 5.3.3
 
   packages/webapi/common:
     dependencies:
@@ -120,6 +135,9 @@ importers:
 
   packages/webapi/platforms/express:
     dependencies:
+      '@thylacine-js/webapi-client':
+        specifier: workspace:^1.0.0
+        version: link:../../client
       '@thylacine-js/webapi-common':
         specifier: workspace:^1.0.0
         version: link:../../common

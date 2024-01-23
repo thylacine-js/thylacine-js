@@ -188,6 +188,39 @@ d
             [factory.createParameterDeclaration(
                 undefined,
                 factory.createToken(ts.SyntaxKind.DotDotDotToken),
+                factory.createIdentifier("params"),
+                undefined,
+                undefined,
+                undefined
+            )],
+            factory.createTypeReferenceNode(
+                factory.createIdentifier("Promise"),
+                [factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)]
+            ),
+            factory.createBlock(
+                [factory.createReturnStatement(factory.createCallExpression(
+                    factory.createPropertyAccessExpression(
+                        factory.createSuper(),
+                        factory.createIdentifier(this.method)
+                    ),
+                    undefined,
+                    [factory.createStringLiteral(this.path), factory.createIdentifier("params")]
+                ))],
+                true
+            )
+        )
+        return factory.createMethodDeclaration(
+            [
+                factory.createToken(ts.SyntaxKind.PublicKeyword),
+                factory.createToken(ts.SyntaxKind.AsyncKeyword)
+            ],
+            undefined,
+            factory.createIdentifier(this.handler.name !== "default" ? this.handler.name : camelCase(`${this.method}_${this.path}`)),
+            undefined,
+            undefined,
+            [factory.createParameterDeclaration(
+                undefined,
+                factory.createToken(ts.SyntaxKind.DotDotDotToken),
                 factory.createIdentifier("args"),
                 undefined,
                 undefined,

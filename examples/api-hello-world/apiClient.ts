@@ -1,30 +1,24 @@
-export class Client {
-    public readonly baseURL: URL;
-    constructor(url: string | URL) {
-        this.baseURL = new URL(url);
+import { ApiClient } from "@thylacine-js/webapi-client/dist/apiClient.mjs";
+export class Client extends ApiClient {
+    constructor(host: string | URL | undefined = process.env.API_ORIGIN) {
+        super(host);
     }
-    public async get(...args): Promise<Response> {
-        let r = await fetch(new URL("/", this.baseURL), { method: "GET" });
-        return r;
+    public async get(...params): Promise<any> {
+        return super.get("/", params);
     }
-    public async postLoginWithPassword(...args): Promise<Response> {
-        let r = await fetch(new URL("/login/withPassword", this.baseURL), { method: "POST" });
-        return r;
+    public async loginWithPassword(...params): Promise<any> {
+        return super.post("/login/withPassword", params);
     }
-    public async postLoginWithToken(...args): Promise<Response> {
-        let r = await fetch(new URL("/login/withToken", this.baseURL), { method: "POST" });
-        return r;
+    public async loginWithToken(...params): Promise<any> {
+        return super.post("/login/withToken", params);
     }
-    public async allLogout(...args): Promise<Response> {
-        let r = await fetch(new URL("/logout", this.baseURL), { method: "ALL" });
-        return r;
+    public async allLogout(...params): Promise<any> {
+        return super.all("/logout", params);
     }
-    public async getSession(...args): Promise<Response> {
-        let r = await fetch(new URL("/session", this.baseURL), { method: "GET" });
-        return r;
+    public async getSession(...params): Promise<any> {
+        return super.get("/session", params);
     }
-    public async wsWs(...args): Promise<Response> {
-        let r = await fetch(new URL("/ws", this.baseURL), { method: "WS" });
-        return r;
+    public async wsWs(...params): Promise<any> {
+        return super.ws("/ws", params);
     }
 }

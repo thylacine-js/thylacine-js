@@ -62,11 +62,11 @@ export async function addHandlersFrom(app: Express & { ws?: expressWs.WebsocketM
 
 export const HTTP_VERBS = METHODS.concat("ws");
 
-export default async function setupRouter(app: Express & { ws?: expressWs.WebsocketMethod<any>; }, { appDir = process.cwd() } = {}) {
+export default async function setupRouter(app: Express & { ws?: expressWs.WebsocketMethod<any>; }, { appDir = process.cwd() } = {}) : Promise<RouteNode>
+{
   const tree = await RouteNode.create("/", nodePath.join(appDir, "routes")) as RouteNode;
   await addHandlersFrom(app, tree);
-
-  await exportClientApi(app, tree);
+  return tree;
 }
 export async function exportClientApi(app: Express, tree: RouteNode) {
   let methods = [];
