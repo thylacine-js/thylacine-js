@@ -1,13 +1,14 @@
 import { RequestHandler, Request } from 'express';
 
-import { Config, appendToStartIfAbsent } from './config.mjs';
+import { Config, appendToStartIfAbsent, trimStart } from './config.mjs';
 import { WebsocketRequestHandler } from 'express-ws';
 import { Extensible } from '@thylacine-js/common/extensible.mjs';
-import ts, { ClassElement, Declaration, MethodDeclaration, Statement, readConfigFile } from 'typescript';
+import ts, { CallExpression, ClassElement, Declaration, MethodDeclaration, ParameterDeclaration, Statement, readConfigFile } from 'typescript';
 import camelCase from 'lodash/camelCase.js';
 import { Dirent, readdirSync } from 'node:fs';
 import nodePath from 'node:path';
 import { FileWatcher } from 'typescript';
+import _, { create } from 'lodash';
 
 
 export const enum CanonicalMethod {
@@ -30,16 +31,37 @@ export type HttpMethod = Extensible<CanonicalMethod, string>;
 
 const PathExp = new RegExp(`(.*)${Config.ROUTE_ROOT}(.*)/(.*).mjs`);
 
+const ParamsExp = /\[(\w+)\]/g;
+
 
 export class RouteNode {
     public readonly path: string;
+
+    public readonly subPath: string;
     public readonly children: Map<string, RouteNode | ApiRoute<any>> = new Map();
 
     public readonly parent: RouteNode;
 
-    public constructor (path: string, parent:RouteNode = null) {
+    public params: { [x: string]: string; };
+
+
+
+
+    public constructor (path: string, parent: RouteNode = null) {
         this.path = path;
+        this.subPath = trimStart(path.replace(parent?.path ?? "", ""), "/");
         this.parent = parent;
+        let s;
+        this.params = { ...parent?.params };
+        while ((s = ParamsExp.exec(this.subPath)) !== null) {
+
+
+                console.log(`Found param ${s[1]} in ${this.subPath}`);
+                this.params[s[1]] = "string";
+
+
+        }
+
     }
 
     static async create(path: string, baseDirectory: string, parent: RouteNode = null): Promise<RouteNode | ApiRoute<RequestHandler | WebsocketRequestHandler> | void> {
@@ -58,7 +80,7 @@ export class RouteNode {
         }
         else if (entries.length === 0) {   /*Don't create a node for an empty directory*/ }
         else {
-            let node = new RouteNode(path,parent);
+            let node = new RouteNode(path, parent);
 
             for (const dirent of entries) {
 
@@ -93,22 +115,51 @@ export class ApiRoute<THandler extends RequestHandler | WebsocketRequestHandler>
     public readonly path: string;
 
     public readonly filePath: string;
-d
+
 
     public handler: THandler;
 
     public readonly middleware: THandler[];
+
+    public readonly subPath: string;
 
     static routeMap = new Map<string, RequestHandler | WebsocketRequestHandler>();
 
     public operation: string;
     parent: RouteNode;
 
+    params: { [x: string]: string; };
+
+    private _templatePath: any;
+    private _interpolatedPath: any;
+    public get parameterizedPath(): any {
+        if (!this._templatePath) {
+            this._templatePath = this.path;
+            for (let key in this.params) {
+                this._templatePath = this._templatePath.replace(`[${key}]`, `:${key}`);
+            }
+            //this._templatePath = this.path.replace(ParamsExp, ":$1");
+        }
+        return this._templatePath;
+    }
+
+    public get interpolatedPath(): any {
+        if (!this._interpolatedPath) {
+            this._interpolatedPath = this.path;
+            for (let key in this.params) {
+                this._interpolatedPath = this._interpolatedPath.replace(`[${key}]`, `\${${key}}`);
+            }
+            //this._templatePath = this.path.replace(ParamsExp, ":$1");
+        }
+        return this._interpolatedPath;
+    }
+
     stringify(): string {
-        return JSON.stringify({ method: this.method, path: this.path, fullPath: this.filePath, handler: this.handler.name, middleware: this.middleware.map(m => m.name) });
+        return JSON.stringify({ method: this.method, path: this.path, operation: this.operation, subPath: this.subPath, parameterizedPath: this.parameterizedPath, interpolatedPath: this.interpolatedPath, filePath: this.filePath, handler: this.handler.name, params: this.params, middleware: this.middleware.map(m => m.name) });
     }
     public static async create(path: string, parent: RouteNode): Promise<ApiRoute<RequestHandler | WebsocketRequestHandler>> {
         const m = path.match(PathExp);
+
         if (m) {
 
             let handler = null;
@@ -117,8 +168,7 @@ d
             let route = appendToStartIfAbsent(m[2], "/");
             let r = null;
 
-            if (!Config.LAZY_LOAD && !Config.HOT_RELOAD)
-            {
+            if (!Config.LAZY_LOAD && !Config.HOT_RELOAD) {
                 let module = await import(path);
                 handler = module.default;
                 middleware = module.middleware || [];
@@ -170,9 +220,53 @@ d
         this.handler = handler;
         this.middleware = middleware;
         this.parent = parent;
+        this.subPath = trimStart(route.replace(parent?.path ?? "", ""), "/");
+        //this.params = { ...parent?.params, [this.subPath.match(ParamsExp)[0]]: "string" };
+        this.operation = this.handler.name !== "default" ? this.handler.name : camelCase(`${this.method}_${this.path}`);
+        let s;
+
+        this.params = { ...parent?.params };
+        while ((s = ParamsExp.exec(this.subPath)) !== null) {
+
+
+            console.log(`Found param ${s[1]} in ${this.subPath}`);
+            this.params[s[1]] = "string";
+
+
+        }
+
+
+
 
     }
 
+    createParameterDeclaration(): ParameterDeclaration[] {
+        let factory = ts.factory;
+
+        if (Object.keys(this.params).length > 0) {
+            let params = [];
+            for (let key in this.params) {
+                params.push(factory.createParameterDeclaration(
+                    undefined,
+                    undefined,
+                    factory.createIdentifier(key),
+                    undefined,
+                    factory.createTypeReferenceNode(this.params[key]),
+                    undefined
+                ));
+            }
+            return params;
+        }
+        else
+            return [factory.createParameterDeclaration(
+                undefined,
+                factory.createToken(ts.SyntaxKind.DotDotDotToken),
+                factory.createIdentifier("params"),
+                undefined,
+                undefined,
+                undefined
+            )];
+    }
 
     public createDeclaration(): MethodDeclaration {
         let factory = ts.factory;
@@ -182,17 +276,10 @@ d
                 factory.createToken(ts.SyntaxKind.AsyncKeyword)
             ],
             undefined,
-            factory.createIdentifier(this.handler.name !== "default" ? this.handler.name : camelCase(`${this.method}_${this.path}`)),
+            factory.createIdentifier(this.operation),
             undefined,
             undefined,
-            [factory.createParameterDeclaration(
-                undefined,
-                factory.createToken(ts.SyntaxKind.DotDotDotToken),
-                factory.createIdentifier("params"),
-                undefined,
-                undefined,
-                undefined
-            )],
+            this.createParameterDeclaration(),
             factory.createTypeReferenceNode(
                 factory.createIdentifier("Promise"),
                 [factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)]
@@ -204,74 +291,9 @@ d
                         factory.createIdentifier(this.method)
                     ),
                     undefined,
-                    [factory.createStringLiteral(this.path), factory.createIdentifier("params")]
+                    Object.keys(this.params).length > 0 ? [factory.createNoSubstitutionTemplateLiteral(this.interpolatedPath, this.interpolatedPath)] :
+                        [factory.createIdentifier("params")]
                 ))],
-                true
-            )
-        )
-        return factory.createMethodDeclaration(
-            [
-                factory.createToken(ts.SyntaxKind.PublicKeyword),
-                factory.createToken(ts.SyntaxKind.AsyncKeyword)
-            ],
-            undefined,
-            factory.createIdentifier(this.handler.name !== "default" ? this.handler.name : camelCase(`${this.method}_${this.path}`)),
-            undefined,
-            undefined,
-            [factory.createParameterDeclaration(
-                undefined,
-                factory.createToken(ts.SyntaxKind.DotDotDotToken),
-                factory.createIdentifier("args"),
-                undefined,
-                undefined,
-                undefined
-            )],
-            factory.createTypeReferenceNode(
-                factory.createIdentifier("Promise"),
-                [factory.createTypeReferenceNode(
-                    factory.createIdentifier("Response"),
-                    undefined
-                )]
-            ),
-            factory.createBlock(
-                [
-                    factory.createVariableStatement(
-                        undefined,
-                        factory.createVariableDeclarationList(
-                            [factory.createVariableDeclaration(
-                                factory.createIdentifier("r"),
-                                undefined,
-                                undefined,
-                                factory.createAwaitExpression(factory.createCallExpression(
-                                    factory.createIdentifier("fetch"),
-                                    undefined,
-                                    [
-                                        factory.createNewExpression(
-                                            factory.createIdentifier("URL"),
-                                            undefined,
-                                            [
-                                                factory.createStringLiteral(this.path),
-                                                factory.createPropertyAccessExpression(
-                                                    factory.createThis(),
-                                                    factory.createIdentifier("baseURL")
-                                                )
-                                            ]
-                                        ),
-                                        factory.createObjectLiteralExpression(
-                                            [factory.createPropertyAssignment(
-                                                factory.createIdentifier("method"),
-                                                factory.createStringLiteral(this.method.toUpperCase())
-                                            )],
-                                            false
-                                        )
-                                    ]
-                                ))
-                            )],
-                            ts.NodeFlags.Let | ts.NodeFlags.AwaitContext | ts.NodeFlags.ContextFlags | ts.NodeFlags.TypeExcludesFlags
-                        )
-                    ),
-                    factory.createReturnStatement(factory.createIdentifier("r"))
-                ],
                 true
             )
         );
