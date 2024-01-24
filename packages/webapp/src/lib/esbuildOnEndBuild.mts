@@ -1,4 +1,4 @@
-export default function esbuildOnEndBuild ({name, handler}) {
+export default function esbuildOnEndBuild({ name, handler }) {
   return {
     name,
     setup(build) {
@@ -6,7 +6,7 @@ export default function esbuildOnEndBuild ({name, handler}) {
         if (handler) {
           await handler(build);
         }
-      })
+      });
     },
-  }
+  };
 }
