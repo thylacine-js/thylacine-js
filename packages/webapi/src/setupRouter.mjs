@@ -30,14 +30,15 @@ async function findRoutes(appDir) {
   return r;
 }
 
-export default async function setupRouter(app, { appDir = process.cwd() } = {}) {
+export default async function setupRouter(
+  app,
+  { appDir = process.cwd() } = {}
+) {
   const routes = await findRoutes(appDir);
   for (const route of routes) {
     const [method, path] = route;
     const module = await import(
-      `${appDir}/routes${path}${
-        path.length === 1 ? "" : "/"
-      }${method}.mjs`
+      `${appDir}/routes${path}${path.length === 1 ? "" : "/"}${method}.mjs`
     );
     if (method === "ws") {
       app.ws(path, module.default);

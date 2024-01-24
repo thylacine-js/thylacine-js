@@ -55,7 +55,7 @@ export default async function setupServer({ appDir = process.cwd() } = {}) {
   );
 
   expressWs(app);
-  await setupRouter(app, {appDir});
+  await setupRouter(app, { appDir });
   app.use((err, req, res, next) => {
     res.json({
       ok: false,

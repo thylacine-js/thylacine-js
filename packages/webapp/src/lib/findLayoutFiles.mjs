@@ -1,7 +1,7 @@
-import _ from 'lodash';
-import { globbySync } from 'globby';
+import _ from "lodash";
+import { globbySync } from "globby";
 
-export default async function findLayoutFiles({appDir = process.cwd()} = {}) {
+export default async function findLayoutFiles({ appDir = process.cwd() } = {}) {
   const r = [];
   const path_matchers = [`${appDir}/layouts/**.jsx`];
   const paths = globbySync(path_matchers);
@@ -10,7 +10,7 @@ export default async function findLayoutFiles({appDir = process.cwd()} = {}) {
     if (m) {
       r.push({
         class_name: m[1],
-        file_path: `${m[1]}.jsx`
+        file_path: `${m[1]}.jsx`,
       });
     }
   }

@@ -47,7 +47,11 @@ export default function createConfig({ appDir = process.cwd() } = {}) {
           const layouts = await findLayoutFiles();
           const routes = await findRouteFiles();
           const injection = createRoutesInjection(routes, layouts, appDir);
-          fs.writeFileSync(`./.temp/inject/ROUTES_LIST.mjs`, injection, "utf-8");
+          fs.writeFileSync(
+            `./.temp/inject/ROUTES_LIST.mjs`,
+            injection,
+            "utf-8"
+          );
         },
       }),
       esbuildOnEndBuild({
