@@ -4,14 +4,22 @@ SCRIPT_DIR=$(dirname "${BASH_SOURCE[0]}")
 
 cd $SCRIPT_DIR/../packages
 
-cd utils 
+cd common 
 pnpm prettier --write .
 cd ..
+
+cd webapi/client 
+pnpm prettier --write .
+cd ../..
+
+cd webapi/common 
+pnpm prettier --write .
+cd ../..
+
+cd webapi/platforms/express 
+pnpm prettier --write .
+cd ../../..
 
 cd webapp
-pnpm prettier --write .
-cd ..
-
-cd webapi
 pnpm prettier --write .
 cd ..

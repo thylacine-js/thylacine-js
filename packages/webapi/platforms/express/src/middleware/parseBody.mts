@@ -1,8 +1,13 @@
 import bodyParser from "body-parser";
-import { IncomingMessage } from 'http';
+import { IncomingMessage } from "http";
 
 let bufferRawBody = bodyParser.raw({
-  verify: (req: IncomingMessage & { rawBody?: string; }, res, buf, encoding?: BufferEncoding) => {
+  verify: (
+    req: IncomingMessage & { rawBody?: string },
+    res,
+    buf,
+    encoding?: BufferEncoding
+  ) => {
     if (buf && buf.length) {
       req.rawBody = buf.toString(encoding || "utf8");
     }
