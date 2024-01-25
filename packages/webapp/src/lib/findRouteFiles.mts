@@ -4,9 +4,7 @@ import { globbySync } from "globby";
 export default async function findRouteFiles({ appDir = process.cwd() } = {}) {
   const FILE_EXTS = ["js", "jsx", "html"];
   const r = [];
-  const path_matchers = FILE_EXTS.map(
-    (FILE_EXT) => `${appDir}/routes/**/index.${FILE_EXT}`
-  );
+  const path_matchers = FILE_EXTS.map((FILE_EXT) => `${appDir}/routes/**/index.${FILE_EXT}`);
   const paths = globbySync(path_matchers);
   for (const path of paths) {
     const m = path.match(`./routes(.*)index\.(.*)`);

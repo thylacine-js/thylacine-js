@@ -1,26 +1,10 @@
 import catchAsyncErrors from "./catchAsyncErrors.mjs";
 import fs from "fs";
-import type {
-  Express,
-  IRouter,
-  RequestHandler,
-  Request as Req,
-  Response as Resp,
-  NextFunction,
-} from "express";
-import expressWs, {
-  Application,
-  WebsocketRequestHandler,
-  WithWebsocketMethod,
-} from "express-ws";
+import type { Express, IRouter, RequestHandler, Request as Req, Response as Resp, NextFunction } from "express";
+import expressWs, { Application, WebsocketRequestHandler, WithWebsocketMethod } from "express-ws";
 import { METHODS } from "http";
 import { WeakExtensible } from "@thylacine-js/common/extensible.mjs";
-import {
-  ApiRoute,
-  CanonicalMethod,
-  HttpMethod,
-  RouteNode,
-} from "./apiRoute.mjs";
+import { ApiRoute, CanonicalMethod, HttpMethod, RouteNode } from "./apiRoute.mjs";
 
 import ts from "typescript";
 
@@ -48,10 +32,7 @@ function addHandler(
   );
 }
 
-export async function addHandlersFrom(
-  app: Express & { ws?: expressWs.WebsocketMethod<any> },
-  node: RouteNode
-) {
+export async function addHandlersFrom(app: Express & { ws?: expressWs.WebsocketMethod<any> }, node: RouteNode) {
   if (node) {
     for (const route of node.children.values()) {
       {
@@ -70,13 +51,7 @@ export async function addHandlersFrom(
             );
           } else {
             const handler = catchAsyncErrors(route.handler as RequestHandler);
-            addHandler(
-              app,
-              route.method,
-              route.path,
-              handler,
-              ...(route.middleware as RequestHandler[])
-            );
+            addHandler(app, route.method, route.path, handler, ...(route.middleware as RequestHandler[]));
           }
         }
       }
@@ -90,25 +65,16 @@ export default async function setupRouter(
   app: Express & { ws?: expressWs.WebsocketMethod<any> },
   { appDir = process.cwd() } = {}
 ): Promise<RouteNode> {
-  const tree = (await RouteNode.create(
-    "/",
-    nodePath.join(appDir, "routes")
-  )) as RouteNode;
+  const tree = (await RouteNode.create("/", nodePath.join(appDir, "routes"))) as RouteNode;
   await addHandlersFrom(app, tree);
   return tree;
 }
 export async function exportClientApi(app: Express, tree: RouteNode) {
-  let methods = [];
-  let sourceFile = ts.createSourceFile(
-    "client.ts",
-    "",
-    ts.ScriptTarget.ESNext,
-    false,
-    ts.ScriptKind.TS
-  );
+  const methods = [];
+  const sourceFile = ts.createSourceFile("client.ts", "", ts.ScriptTarget.ESNext, false, ts.ScriptKind.TS);
 
-  let factory = ts.factory;
-  //@ts-expect-error
+  const factory = ts.factory;
+  //@ts-expect-error statements can be updated
   sourceFile.statements = [
     factory.createClassDeclaration(
       [factory.createToken(ts.SyntaxKind.ExportKeyword)],
@@ -117,16 +83,10 @@ export async function exportClientApi(app: Express, tree: RouteNode) {
       undefined,
       [
         factory.createPropertyDeclaration(
-          [
-            factory.createToken(ts.SyntaxKind.PublicKeyword),
-            factory.createToken(ts.SyntaxKind.ReadonlyKeyword),
-          ],
+          [factory.createToken(ts.SyntaxKind.PublicKeyword), factory.createToken(ts.SyntaxKind.ReadonlyKeyword)],
           factory.createIdentifier("baseURL"),
           undefined,
-          factory.createTypeReferenceNode(
-            factory.createIdentifier("URL"),
-            undefined
-          ),
+          factory.createTypeReferenceNode(factory.createIdentifier("URL"), undefined),
           undefined
         ),
         factory.createConstructorDeclaration(
@@ -139,10 +99,7 @@ export async function exportClientApi(app: Express, tree: RouteNode) {
               undefined,
               factory.createUnionTypeNode([
                 factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-                factory.createTypeReferenceNode(
-                  factory.createIdentifier("URL"),
-                  undefined
-                ),
+                factory.createTypeReferenceNode(factory.createIdentifier("URL"), undefined),
               ]),
               undefined
             ),
@@ -151,16 +108,11 @@ export async function exportClientApi(app: Express, tree: RouteNode) {
             [
               factory.createExpressionStatement(
                 factory.createBinaryExpression(
-                  factory.createPropertyAccessExpression(
-                    factory.createThis(),
-                    factory.createIdentifier("baseURL")
-                  ),
+                  factory.createPropertyAccessExpression(factory.createThis(), factory.createIdentifier("baseURL")),
                   factory.createToken(ts.SyntaxKind.EqualsToken),
-                  factory.createNewExpression(
-                    factory.createIdentifier("URL"),
-                    undefined,
-                    [factory.createIdentifier("url")]
-                  )
+                  factory.createNewExpression(factory.createIdentifier("URL"), undefined, [
+                    factory.createIdentifier("url"),
+                  ])
                 )
               ),
             ],

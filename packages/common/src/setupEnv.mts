@@ -3,9 +3,7 @@ import dotenv from "dotenv";
 import dotenvExpand from "dotenv-expand";
 
 export default function setupEnv(projectPath = process.cwd()) {
-  const dotenv_fp = `${projectPath}/.env.${
-    process.env.NODE_ENV || "development"
-  }`;
+  const dotenv_fp = `${projectPath}/.env.${process.env.NODE_ENV || "development"}`;
   let env;
   if (fs.existsSync(dotenv_fp)) {
     env = dotenv.config({

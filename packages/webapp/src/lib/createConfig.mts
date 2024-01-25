@@ -9,15 +9,8 @@ import findLayoutFiles from "./findLayoutFiles.mjs";
 import createRoutesInjection from "./createRoutesInjection.mjs";
 import { BuildOptions } from "esbuild";
 
-export default function createConfig({
-  appDir = process.cwd(),
-} = {}): BuildOptions {
-  const allowedEnvVars = [
-    "NODE_ENV",
-    "WWW_ORIGIN",
-    "API_ORIGIN",
-    "COOKIE_DOMAIN",
-  ];
+export default function createConfig({ appDir = process.cwd() } = {}): BuildOptions {
+  const allowedEnvVars = ["NODE_ENV", "WWW_ORIGIN", "API_ORIGIN", "COOKIE_DOMAIN"];
 
   const clientEnv = { "process.env.TIMESTAMP": Date.now().toString() };
 
@@ -29,10 +22,7 @@ export default function createConfig({
 
   fs.ensureFileSync(`${appDir}/.temp/inject/ROUTES_LIST.mjs`);
 
-  const BUILD_DIR =
-    process.env.NODE_ENV === "production"
-      ? "dist/production"
-      : "dist/development";
+  const BUILD_DIR = process.env.NODE_ENV === "production" ? "dist/production" : "dist/development";
 
   return {
     entryPoints: ["app.jsx"],
@@ -50,11 +40,7 @@ export default function createConfig({
           const layouts = await findLayoutFiles();
           const routes = await findRouteFiles();
           const injection = createRoutesInjection(routes, layouts, appDir);
-          fs.writeFileSync(
-            `./.temp/inject/ROUTES_LIST.mjs`,
-            injection,
-            "utf-8"
-          );
+          fs.writeFileSync(`./.temp/inject/ROUTES_LIST.mjs`, injection, "utf-8");
         },
       }),
       esbuildOnEndBuild({
@@ -74,17 +60,10 @@ export default function createConfig({
                 ...clientEnv,
                 "process.env.TIMESTAMP": Date.now().toString(),
               })) {
-                c = c.replaceAll(
-                  `{{${kv[0]}}}`,
-                  kv[1].replace(/^'(.*)'$/, "$1")
-                );
+                c = c.replaceAll(`{{${kv[0]}}}`, kv[1].replace(/^'(.*)'$/, "$1"));
                 c = c.replaceAll(kv[0], kv[1]);
               }
-              fs.writeFileSync(
-                `${BUILD_DIR}/${env_match[1]}\.${env_match[2]}`,
-                c,
-                "utf-8"
-              );
+              fs.writeFileSync(`${BUILD_DIR}/${env_match[1]}\.${env_match[2]}`, c, "utf-8");
             } else {
               fs.copyFileSync(fp, `${BUILD_DIR}/${wp}`);
             }

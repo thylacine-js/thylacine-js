@@ -3,16 +3,10 @@ import fs from "fs";
 import { RouteNode } from "@thylacine-js/webapi-common/apiRoute.mjs";
 
 export async function generateClientApiStubs(tree: RouteNode) {
-  let methods = [];
-  let sourceFile = ts.createSourceFile(
-    "client.ts",
-    "",
-    ts.ScriptTarget.ESNext,
-    false,
-    ts.ScriptKind.TS
-  );
+  const methods = [];
+  const sourceFile = ts.createSourceFile("client.ts", "", ts.ScriptTarget.ESNext, false, ts.ScriptKind.TS);
 
-  let factory = ts.factory;
+  const factory = ts.factory;
   //@ts-expect-error
   sourceFile.statements = [
     factory.createImportDeclaration(
@@ -21,11 +15,7 @@ export async function generateClientApiStubs(tree: RouteNode) {
         false,
         undefined,
         factory.createNamedImports([
-          factory.createImportSpecifier(
-            false,
-            undefined,
-            factory.createIdentifier("ApiClient")
-          ),
+          factory.createImportSpecifier(false, undefined, factory.createIdentifier("ApiClient")),
         ])
       ),
       factory.createStringLiteral("@thylacine-js/webapi-client/apiClient.mjs"),
@@ -37,10 +27,7 @@ export async function generateClientApiStubs(tree: RouteNode) {
       undefined,
       [
         factory.createHeritageClause(ts.SyntaxKind.ExtendsKeyword, [
-          factory.createExpressionWithTypeArguments(
-            factory.createIdentifier("ApiClient"),
-            undefined
-          ),
+          factory.createExpressionWithTypeArguments(factory.createIdentifier("ApiClient"), undefined),
         ]),
       ],
       [
@@ -54,10 +41,7 @@ export async function generateClientApiStubs(tree: RouteNode) {
               undefined,
               factory.createUnionTypeNode([
                 factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-                factory.createTypeReferenceNode(
-                  factory.createIdentifier("URL"),
-                  undefined
-                ),
+                factory.createTypeReferenceNode(factory.createIdentifier("URL"), undefined),
                 factory.createKeywordTypeNode(ts.SyntaxKind.UndefinedKeyword),
               ]),
               factory.createPropertyAccessExpression(
@@ -72,9 +56,7 @@ export async function generateClientApiStubs(tree: RouteNode) {
           factory.createBlock(
             [
               factory.createExpressionStatement(
-                factory.createCallExpression(factory.createSuper(), undefined, [
-                  factory.createIdentifier("host"),
-                ])
+                factory.createCallExpression(factory.createSuper(), undefined, [factory.createIdentifier("host")])
               ),
             ],
             true

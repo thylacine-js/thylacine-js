@@ -63,49 +63,31 @@ export class RouteNode {
     path: string,
     baseDirectory: string,
     parent: RouteNode = null
-  ): Promise<
-    RouteNode | ApiRoute<RequestHandler | WebsocketRequestHandler> | void
-  > {
-    let entries = readdirSync(nodePath.join(baseDirectory, path), {
+  ): Promise<RouteNode | ApiRoute<RequestHandler | WebsocketRequestHandler> | void> {
+    const entries = readdirSync(nodePath.join(baseDirectory, path), {
       withFileTypes: true,
     }) as Dirent[];
-    console.log(
-      `Path ${path} with baseDirectory ${baseDirectory} has ${entries.length} entries.`
-    );
+    console.log(`Path ${path} with baseDirectory ${baseDirectory} has ${entries.length} entries.`);
     if (entries.length === 1) {
       const dirent = entries[0];
       if (dirent.isFile() && entries[0].name.endsWith(".mjs")) {
-        return await ApiRoute.create(
-          nodePath.join(dirent.path, dirent.name),
-          parent
-        );
+        return await ApiRoute.create(nodePath.join(dirent.path, dirent.name), parent);
       } else if (entries[0].isDirectory()) {
-        return await RouteNode.create(
-          nodePath.join(path, dirent.name),
-          baseDirectory,
-          parent
-        );
+        return await RouteNode.create(nodePath.join(path, dirent.name), baseDirectory, parent);
       }
     } else if (entries.length === 0) {
       /*Don't create a node for an empty directory*/
     } else {
-      let node = new RouteNode(path, parent);
+      const node = new RouteNode(path, parent);
 
       for (const dirent of entries) {
         if (dirent.isDirectory()) {
-          let childNode = await RouteNode.create(
-            nodePath.join(path, dirent.name),
-            baseDirectory,
-            node
-          );
+          const childNode = await RouteNode.create(nodePath.join(path, dirent.name), baseDirectory, node);
           if (childNode) {
             node.children.set(childNode.path, childNode);
           }
         } else if (dirent.isFile() && dirent.name.endsWith(".mjs")) {
-          node.children.set(
-            dirent.name,
-            await ApiRoute.create(nodePath.join(dirent.path, dirent.name), node)
-          );
+          node.children.set(dirent.name, await ApiRoute.create(nodePath.join(dirent.path, dirent.name), node));
         }
       }
       return node;
@@ -113,15 +95,11 @@ export class RouteNode {
   }
 
   public createDeclaration(): ClassElement[] {
-    return Array.from(this.children.values()).flatMap((p) =>
-      p.createDeclaration()
-    );
+    return Array.from(this.children.values()).flatMap((p) => p.createDeclaration());
   }
 }
 
-export class ApiRoute<
-  THandler extends RequestHandler | WebsocketRequestHandler,
-> {
+export class ApiRoute<THandler extends RequestHandler | WebsocketRequestHandler> {
   public readonly method: HttpMethod;
   public readonly path: string;
 
@@ -145,7 +123,7 @@ export class ApiRoute<
   public get parameterizedPath(): any {
     if (!this._templatePath) {
       this._templatePath = this.path;
-      for (let key in this.params) {
+      for (const key in this.params) {
         this._templatePath = this._templatePath.replace(`[${key}]`, `:${key}`);
       }
       //this._templatePath = this.path.replace(ParamsExp, ":$1");
@@ -156,11 +134,8 @@ export class ApiRoute<
   public get interpolatedPath(): any {
     if (!this._interpolatedPath) {
       this._interpolatedPath = this.path;
-      for (let key in this.params) {
-        this._interpolatedPath = this._interpolatedPath.replace(
-          `[${key}]`,
-          `\${${key}}`
-        );
+      for (const key in this.params) {
+        this._interpolatedPath = this._interpolatedPath.replace(`[${key}]`, `\${${key}}`);
       }
       //this._templatePath = this.path.replace(ParamsExp, ":$1");
     }
@@ -190,12 +165,12 @@ export class ApiRoute<
     if (m) {
       let handler = null;
       let middleware = [];
-      let method = m[3].toLowerCase() as HttpMethod;
-      let route = appendToStartIfAbsent(m[2], "/");
+      const method = m[3].toLowerCase() as HttpMethod;
+      const route = appendToStartIfAbsent(m[2], "/");
       let r = null;
 
       if (!Config.LAZY_LOAD && !Config.HOT_RELOAD) {
-        let module = await import(path);
+        const module = await import(path);
         handler = module.default;
         middleware = module.middleware || [];
       } else {
@@ -203,7 +178,7 @@ export class ApiRoute<
           let actHandler = this.routeMap.get(res.path) as RequestHandler;
           if (actHandler) return actHandler(res, req, next);
           else {
-            let module = await import(path);
+            const module = await import(path);
             if (module.default) actHandler = module.default;
             this.routeMap[res.path] = actHandler;
             return actHandler(res, req, next);
@@ -211,29 +186,14 @@ export class ApiRoute<
         };
       }
       if (Config.HOT_RELOAD) {
-        let module = await import(path);
+        const module = await import(path);
 
         this.routeMap[path] = module.default;
         middleware = module.middleware || [];
       }
       if (method !== CanonicalMethod.ws) {
-        r = new ApiRoute<RequestHandler>(
-          method,
-          route,
-          path,
-          handler,
-          middleware,
-          parent
-        );
-      } else
-        r = new ApiRoute<WebsocketRequestHandler>(
-          method,
-          route,
-          path,
-          handler,
-          middleware,
-          parent
-        );
+        r = new ApiRoute<RequestHandler>(method, route, path, handler, middleware, parent);
+      } else r = new ApiRoute<WebsocketRequestHandler>(method, route, path, handler, middleware, parent);
 
       console.log(r.stringify());
       return r;
@@ -257,10 +217,7 @@ export class ApiRoute<
     this.parent = parent;
     this.subPath = trimStart(route.replace(parent?.path ?? "", ""), "/");
     //this.params = { ...parent?.params, [this.subPath.match(ParamsExp)[0]]: "string" };
-    this.operation =
-      this.handler.name !== "default"
-        ? this.handler.name
-        : camelCase(`${this.method}_${this.path}`);
+    this.operation = this.handler.name !== "default" ? this.handler.name : camelCase(`${this.method}_${this.path}`);
     let s;
 
     this.params = { ...parent?.params };
@@ -271,11 +228,11 @@ export class ApiRoute<
   }
 
   createParameterDeclaration(): ParameterDeclaration[] {
-    let factory = ts.factory;
+    const factory = ts.factory;
 
     if (Object.keys(this.params).length > 0) {
-      let params = [];
-      for (let key in this.params) {
+      const params = [];
+      for (const key in this.params) {
         params.push(
           factory.createParameterDeclaration(
             undefined,
@@ -302,12 +259,9 @@ export class ApiRoute<
   }
 
   public createDeclaration(): MethodDeclaration {
-    let factory = ts.factory;
+    const factory = ts.factory;
     return factory.createMethodDeclaration(
-      [
-        factory.createToken(ts.SyntaxKind.PublicKeyword),
-        factory.createToken(ts.SyntaxKind.AsyncKeyword),
-      ],
+      [factory.createToken(ts.SyntaxKind.PublicKeyword), factory.createToken(ts.SyntaxKind.AsyncKeyword)],
       undefined,
       factory.createIdentifier(this.operation),
       undefined,
@@ -320,18 +274,10 @@ export class ApiRoute<
         [
           factory.createReturnStatement(
             factory.createCallExpression(
-              factory.createPropertyAccessExpression(
-                factory.createSuper(),
-                factory.createIdentifier(this.method)
-              ),
+              factory.createPropertyAccessExpression(factory.createSuper(), factory.createIdentifier(this.method)),
               undefined,
               Object.keys(this.params).length > 0
-                ? [
-                    factory.createNoSubstitutionTemplateLiteral(
-                      this.interpolatedPath,
-                      this.interpolatedPath
-                    ),
-                  ]
+                ? [factory.createNoSubstitutionTemplateLiteral(this.interpolatedPath, this.interpolatedPath)]
                 : [factory.createIdentifier("params")]
             )
           ),

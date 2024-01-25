@@ -1,10 +1,5 @@
 import { Handler, RequestHandler } from "express";
-import {
-  Request,
-  ParamsDictionary,
-  Response,
-  NextFunction,
-} from "express-serve-static-core";
+import { Request, ParamsDictionary, Response, NextFunction } from "express-serve-static-core";
 import { ParsedQs } from "qs";
 import { isAsyncFunction, isPromise } from "util/types";
 

@@ -3,13 +3,7 @@ export class Config {
   public static get ROUTE_ROOT(): string {
     return (
       Config._ROUTE_ROOT ??
-      trimEnd(
-        appendToStartIfAbsent(
-          (Config._ROUTE_ROOT = process.env.ROUTE_ROOT ?? "/routes"),
-          "/"
-        ),
-        "/"
-      )
+      trimEnd(appendToStartIfAbsent((Config._ROUTE_ROOT = process.env.ROUTE_ROOT ?? "/routes"), "/"), "/")
     );
   }
 
@@ -19,42 +13,27 @@ export class Config {
   static _HOT_RELOAD: boolean;
   public static get HOT_RELOAD(): boolean {
     return (
-      this._HOT_RELOAD ??
-      (this._HOT_RELOAD = Boolean(
-        process.env.HOT_RELOAD ?? process.env.NODE_ENV === "development"
-      ))
+      this._HOT_RELOAD ?? (this._HOT_RELOAD = Boolean(process.env.HOT_RELOAD ?? process.env.NODE_ENV === "development"))
     );
   }
 }
 
-export function appendToEndIfAbsent(
-  input: string = "",
-  decorator: string
-): string {
+export function appendToEndIfAbsent(input = "", decorator: string): string {
   return input.endsWith(decorator) ? input : input + decorator;
 }
 
-export function trimEnd(input: string = "", decorator: string): string {
+export function trimEnd(input = "", decorator: string): string {
   return input.endsWith(decorator) ? input.slice(0, -decorator.length) : input;
 }
 
-export function trimStart(input: string = "", decorator: string): string {
+export function trimStart(input = "", decorator: string): string {
   return input.startsWith(decorator) ? input.slice(decorator.length) : input;
 }
 
-export function appendToStartIfAbsent(
-  input: string = "",
-  decorator: string
-): string {
+export function appendToStartIfAbsent(input = "", decorator: string): string {
   return input.startsWith(decorator) ? input : decorator + input;
 }
 
-export function surroundWithIfAbsent(
-  input: string = "",
-  decorator: string
-): string {
-  return appendToStartIfAbsent(
-    appendToEndIfAbsent(input, decorator),
-    decorator
-  );
+export function surroundWithIfAbsent(input = "", decorator: string): string {
+  return appendToStartIfAbsent(appendToEndIfAbsent(input, decorator), decorator);
 }
