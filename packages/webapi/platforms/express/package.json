@@ -1,0 +1,48 @@
+{
+  "name": "@thylacine-js/webapi-express",
+  "version": "1.0.0",
+  "description": "Thylacine Web API Framework (Express)",
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./*": "./dist/*"
+  },
+  "main": "dist/index.mjs",
+  "files": [
+    "dist",
+    "dist/*"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@thylacine-js/webapi-common": "workspace:^1.0.0",
+    "@thylacine-js/webapi-client": "workspace:^1.0.0",
+    "body-parser": "^1.20.2",
+    "cookie-parser": "^1.4.6",
+    "cookie-session": "^2.0.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "express-ws": "^5.0.2",
+    "globby": "^14.0.0",
+    "multer": "1.4.5-lts.1"
+  },
+  "devDependencies": {
+    "@types/body-parser": "1.19.5",
+    "@types/connect": "3.4.38",
+    "@types/cookie-parser": "^1.4.6",
+    "@types/cookie-session": "^2.0.0",
+    "@types/cors": "^2.8.5",
+    "@types/express": "^4.17.21",
+    "@types/express-serve-static-core": "4.17.41",
+    "@types/express-ws": "^3.0.4",
+    "@types/globby": "^9.1.0",
+    "@types/multer": "1.4.5",
+    "@types/node": "^20.11.4",
+    "@types/qs": "^6.9.11",
+    "fastify": "^4.25.2"
+  }
+}

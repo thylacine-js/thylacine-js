@@ -1,0 +1,28 @@
+{
+  "name": "@thylacine-js/monorepo",
+  "version": "0.0.0",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "examples/*"
+  ],
+  "scripts": {
+    "build": "pnpm run build:packages",
+    "build:packages": "pnpm run build:packages:ts",
+    "build:packages:ts": "tsc -b packages/*/tsconfig.json",
+    "build:examples": "",
+    "test": "run test",
+    "lint": "eslint ./ --fix --ext .mts",
+    "format": "prettier --write ."
+  },
+  "engines": {
+    "node": ">=18.1.0",
+    "pnpm": ">=8.14.1"
+  },
+  "packageManager": "pnpm@8.14.1",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.9.1",
+    "eslint": "^8.56.0",
+    "prettier": "^3.2.4"
+  }
+}
