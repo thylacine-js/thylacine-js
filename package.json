@@ -7,7 +7,10 @@
     "examples/*"
   ],
   "scripts": {
-    "build": "run build",
+    "build": "pnpm run build:packages",
+    "build:packages": "pnpm run build:packages:ts",
+    "build:packages:ts": "tsc -b packages/*/tsconfig.json",
+    "build:examples": "",
     "test": "run test",
     "lint": "eslint ./ --fix --ext .mts",
     "format": "prettier --write ."

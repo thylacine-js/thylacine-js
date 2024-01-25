@@ -278,7 +278,7 @@ export class ApiRoute<THandler extends RequestHandler | WebsocketRequestHandler>
               undefined,
               Object.keys(this.params).length > 0
                 ? [factory.createNoSubstitutionTemplateLiteral(this.interpolatedPath, this.interpolatedPath)]
-                : [factory.createIdentifier("params")]
+                : [factory.createStringLiteral(this.path),factory.createIdentifier("params")]
             )
           ),
         ],

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { METHODS } from "http";
 import ts from "typescript";
 
