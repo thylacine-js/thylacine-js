@@ -7,13 +7,11 @@
     "examples/*"
   ],
   "scripts": {
-    "build": "pnpm run build:packages",
-    "build:packages": "pnpm run build:packages:ts",
-    "build:packages:ts": "tsc -b packages/*/tsconfig.json",
-    "build:examples": "",
+    "build": "lerna run build",
     "test": "run test",
     "lint": "eslint ./ --fix --ext .mts",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "start": "lerna run start"
   },
   "engines": {
     "node": ">=18.1.0",
@@ -23,6 +21,8 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.9.1",
     "eslint": "^8.56.0",
-    "prettier": "^3.2.4"
+    "lerna": "^8.0.2",
+    "prettier": "^3.2.4",
+    "typescript": "^5.3.3"
   }
 }

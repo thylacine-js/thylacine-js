@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { RequestHandler, Request } from "express";
 
 import { Config, appendToStartIfAbsent, trimStart } from "./config.mjs";
@@ -7,15 +8,17 @@ import ts, {
   CallExpression,
   ClassElement,
   Declaration,
+  FunctionDeclaration,
   MethodDeclaration,
   ParameterDeclaration,
   Statement,
   readConfigFile,
+  createLanguageService,
 } from "typescript";
 import camelCase from "lodash/camelCase.js";
 import { Dirent, readdirSync } from "node:fs";
 import nodePath from "node:path";
-import { FileWatcher } from "typescript";
+
 import _, { create } from "lodash";
 
 export const enum CanonicalMethod {
@@ -201,6 +204,16 @@ export class ApiRoute<THandler extends RequestHandler | WebsocketRequestHandler>
     throw new Error(`Invalid path ${path}`);
   }
 
+  static visitChildren(child: ts.Node, cb: (p: ts.Node) => void) {
+    const t = child;
+    if (t !== undefined) {
+      cb(t);
+      child.forEachChild((p) => this.visitChildren(p, cb));
+    }
+  }
+
+
+
   private constructor(
     method: HttpMethod,
     route: string,
@@ -219,6 +232,32 @@ export class ApiRoute<THandler extends RequestHandler | WebsocketRequestHandler>
     //this.params = { ...parent?.params, [this.subPath.match(ParamsExp)[0]]: "string" };
     this.operation = this.handler.name !== "default" ? this.handler.name : camelCase(`${this.method}_${this.path}`);
     let s;
+    const prog = ts.createProgram([this.filePath], { allowJs: true });
+    const src = prog.getSourceFile(this.filePath);
+    const tc = prog.getTypeChecker();
+
+    ApiRoute.visitChildren(src, (p) => {
+      if (ts.isFunctionDeclaration(p)) {
+        //console.log((p, src, prog));
+
+        console.log(prog.getTypeChecker().signatureToString(prog.getTypeChecker().getSignatureFromDeclaration(p)));
+        p.parameters.forEach((q) => {
+          const qs = tc.getSymbolAtLocation(q);
+
+          console.log(
+            `${q.name.getFullText()}: type is ${prog.getTypeChecker().typeToString(prog.getTypeChecker().getTypeAtLocation(q))}`
+          );
+          ApiRoute.visitChildren(p.body, (r) => {
+            if (ts.isPropertyAccessExpression(r)) {
+              if (tc.getSymbolAtLocation(r.expression).valueDeclaration === q) {
+                console.log(r.getText());
+              }
+
+            }
+          });
+        });
+      }
+    });
 
     this.params = { ...parent?.params };
     while ((s = ParamsExp.exec(this.subPath)) !== null) {
@@ -278,7 +317,7 @@ export class ApiRoute<THandler extends RequestHandler | WebsocketRequestHandler>
               undefined,
               Object.keys(this.params).length > 0
                 ? [factory.createNoSubstitutionTemplateLiteral(this.interpolatedPath, this.interpolatedPath)]
-                : [factory.createStringLiteral(this.path),factory.createIdentifier("params")]
+                : [factory.createStringLiteral(this.path), factory.createIdentifier("params")]
             )
           ),
         ],
