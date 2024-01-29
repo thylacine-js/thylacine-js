@@ -27,22 +27,22 @@ importers:
   examples/api-hello-world:
     dependencies:
       '@thylacine-js/common':
-        specifier: workspace:^1.0.0
+        specifier: workspace:*
         version: link:../../packages/common
       '@thylacine-js/webapi-client':
-        specifier: workspace:^1.0.0
+        specifier: workspace:*
         version: link:../../packages/webapi/client
       '@thylacine-js/webapi-express':
-        specifier: workspace:^1.0.0
+        specifier: workspace:*
         version: link:../../packages/webapi/platforms/express
 
   examples/www-hello-world:
     dependencies:
       '@thylacine-js/common':
-        specifier: workspace:^1.0.0
+        specifier: workspace:*
         version: link:../../packages/common
       '@thylacine-js/webapp':
-        specifier: workspace:^1.0.0
+        specifier: workspace:*
         version: link:../../packages/webapp
       react:
         specifier: ^18.2.0
@@ -76,10 +76,10 @@ importers:
   packages/webapi/client:
     dependencies:
       '@thylacine-js/common':
-        specifier: workspace:^1.0.0
+        specifier: workspace:^1.0.0-alpha.0
         version: link:../../common
       '@thylacine-js/webapi-common':
-        specifier: workspace:^1.0.0
+        specifier: workspace:^1.0.0-alpha.0
         version: link:../common
       typescript:
         specifier: 5.3.3
@@ -88,7 +88,7 @@ importers:
   packages/webapi/common:
     dependencies:
       '@thylacine-js/common':
-        specifier: workspace:^1.0.0
+        specifier: workspace:^1.0.0-alpha.0
         version: link:../../common
       body-parser:
         specifier: ^1.20.2
@@ -164,10 +164,10 @@ importers:
   packages/webapi/platforms/express:
     dependencies:
       '@thylacine-js/webapi-client':
-        specifier: workspace:^1.0.0
+        specifier: workspace:^1.0.0-alpha.0
         version: link:../../client
       '@thylacine-js/webapi-common':
-        specifier: workspace:^1.0.0
+        specifier: workspace:^1.0.0-alpha.0
         version: link:../../common
       body-parser:
         specifier: ^1.20.2

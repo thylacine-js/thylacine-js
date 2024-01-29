@@ -11,8 +11,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@thylacine-js/common": "workspace:^1.0.0",
-    "@thylacine-js/webapp": "workspace:^1.0.0",
+    "@thylacine-js/common": "workspace:*",
+    "@thylacine-js/webapp": "workspace:*",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.21.2"

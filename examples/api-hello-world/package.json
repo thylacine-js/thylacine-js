@@ -11,8 +11,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@thylacine-js/common": "workspace:^1.0.0",
-    "@thylacine-js/webapi-express": "workspace:^1.0.0",
-    "@thylacine-js/webapi-client": "workspace:^1.0.0"
+    "@thylacine-js/common": "workspace:*",
+    "@thylacine-js/webapi-express": "workspace:*",
+    "@thylacine-js/webapi-client": "workspace:*"
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@thylacine-js/webapi-express",
-  "version": "1.0.0",
+  "version": "1.0.0-alpha.0",
   "description": "Thylacine Web API Framework (Express)",
   "license": "ISC",
   "author": "",
@@ -19,8 +19,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@thylacine-js/webapi-common": "workspace:^1.0.0",
-    "@thylacine-js/webapi-client": "workspace:^1.0.0",
+    "@thylacine-js/webapi-client": "workspace:^1.0.0-alpha.0",
+    "@thylacine-js/webapi-common": "workspace:^1.0.0-alpha.0",
     "body-parser": "^1.20.2",
     "cookie-parser": "^1.4.6",
     "cookie-session": "^2.0.0",
