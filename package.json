@@ -12,7 +12,8 @@
     "lint": "eslint ./ --fix --ext .mts",
     "format": "prettier --write .",
     "start": "lerna run start",
-    "version": "lerna version --no-private"
+    "version": "lerna version --no-private",
+    "publish": "lerna publish --no-private"
   },
   "engines": {
     "node": ">=18.1.0",
