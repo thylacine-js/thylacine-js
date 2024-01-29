@@ -57,7 +57,7 @@ export class RouteNode {
     let s;
     this.params = { ...parent?.params };
     while ((s = ParamsExp.exec(this.subPath)) !== null) {
-      console.log(`Found param ${s[1]} in ${this.subPath}`);
+      // console.log(`Found param ${s[1]} in ${this.subPath}`);
       this.params[s[1]] = "string";
     }
   }
@@ -70,7 +70,7 @@ export class RouteNode {
     const entries = readdirSync(nodePath.join(baseDirectory, path), {
       withFileTypes: true,
     }) as Dirent[];
-    console.log(`Path ${path} with baseDirectory ${baseDirectory} has ${entries.length} entries.`);
+    // console.log(`Path ${path} with baseDirectory ${baseDirectory} has ${entries.length} entries.`);
     if (entries.length === 1) {
       const dirent = entries[0];
       if (dirent.isFile() && entries[0].name.endsWith(".mjs")) {
@@ -159,6 +159,7 @@ export class ApiRoute<THandler extends RequestHandler | WebsocketRequestHandler>
       middleware: this.middleware.map((m) => m.name),
     });
   }
+
   public static async create(
     path: string,
     parent: RouteNode
@@ -179,8 +180,9 @@ export class ApiRoute<THandler extends RequestHandler | WebsocketRequestHandler>
       } else {
         handler = async (res: Request, req, next) => {
           let actHandler = this.routeMap.get(res.path) as RequestHandler;
-          if (actHandler) return actHandler(res, req, next);
-          else {
+          if (actHandler) {
+            return actHandler(res, req, next);
+          } else {
             const module = await import(path);
             if (module.default) actHandler = module.default;
             this.routeMap[res.path] = actHandler;
@@ -198,7 +200,7 @@ export class ApiRoute<THandler extends RequestHandler | WebsocketRequestHandler>
         r = new ApiRoute<RequestHandler>(method, route, path, handler, middleware, parent);
       } else r = new ApiRoute<WebsocketRequestHandler>(method, route, path, handler, middleware, parent);
 
-      console.log(r.stringify());
+      // console.log(r.stringify());
       return r;
     }
     throw new Error(`Invalid path ${path}`);
@@ -238,17 +240,17 @@ export class ApiRoute<THandler extends RequestHandler | WebsocketRequestHandler>
       if (ts.isFunctionDeclaration(p)) {
         //console.log((p, src, prog));
 
-        console.log(prog.getTypeChecker().signatureToString(prog.getTypeChecker().getSignatureFromDeclaration(p)));
+        // console.log(prog.getTypeChecker().signatureToString(prog.getTypeChecker().getSignatureFromDeclaration(p)));
         p.parameters.forEach((q) => {
           const qs = tc.getSymbolAtLocation(q);
 
-          console.log(
-            `${q.name.getFullText()}: type is ${prog.getTypeChecker().typeToString(prog.getTypeChecker().getTypeAtLocation(q))}`
-          );
+          // console.debug(
+          //   `${q.name.getFullText()}: type is ${prog.getTypeChecker().typeToString(prog.getTypeChecker().getTypeAtLocation(q))}`
+          // );
           ApiRoute.visitChildren(p.body, (r) => {
             if (ts.isPropertyAccessExpression(r)) {
-              if (tc.getSymbolAtLocation(r.expression).valueDeclaration === q) {
-                console.log(r.getText());
+              if (tc.getSymbolAtLocation(r.expression)?.valueDeclaration === q) {
+                // console.log(r.getText());
               }
             }
           });
@@ -258,7 +260,7 @@ export class ApiRoute<THandler extends RequestHandler | WebsocketRequestHandler>
 
     this.params = { ...parent?.params };
     while ((s = ParamsExp.exec(this.subPath)) !== null) {
-      console.log(`Found param ${s[1]} in ${this.subPath}`);
+      // console.log(`Found param ${s[1]} in ${this.subPath}`);
       this.params[s[1]] = "string";
     }
   }

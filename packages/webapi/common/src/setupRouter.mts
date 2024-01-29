@@ -51,7 +51,7 @@ export async function addHandlersFrom(app: Express & { ws?: expressWs.WebsocketM
             );
           } else {
             const handler = catchAsyncErrors(route.handler as RequestHandler);
-            addHandler(app, route.method, route.path, handler, ...(route.middleware as RequestHandler[]));
+            addHandler(app, route.method, route.parameterizedPath, handler, ...(route.middleware as RequestHandler[]));
           }
         }
       }
@@ -59,7 +59,7 @@ export async function addHandlersFrom(app: Express & { ws?: expressWs.WebsocketM
   }
 }
 
-export const HTTP_VERBS = METHODS.concat("ws");
+export const HTTP_VERBS = [...METHODS, "all", "ws"];
 
 export default async function setupRouter(
   app: Express & { ws?: expressWs.WebsocketMethod<any> },
@@ -69,6 +69,7 @@ export default async function setupRouter(
   await addHandlersFrom(app, tree);
   return tree;
 }
+
 export async function exportClientApi(app: Express, tree: RouteNode) {
   const methods = [];
   const sourceFile = ts.createSourceFile("client.ts", "", ts.ScriptTarget.ESNext, false, ts.ScriptKind.TS);
