@@ -1,25 +1,35 @@
 #!/usr/bin/env bash
 
-SCRIPT_DIR=$(dirname "${BASH_SOURCE[0]}") 
+SCRIPT_DIR=$(dirname "${BASH_SOURCE[0]}")
 
 cd $SCRIPT_DIR/../packages
 
-cd common 
+cd common
 pnpm prettier --write .
 cd ..
 
-cd webapi/client 
+cd webapi/client
 pnpm prettier --write .
 cd ../..
 
-cd webapi/common 
+cd webapi/common
 pnpm prettier --write .
 cd ../..
 
-cd webapi/platforms/express 
+cd webapi/platforms/express
 pnpm prettier --write .
 cd ../../..
 
 cd webapp
+pnpm prettier --write .
+cd ..
+
+cd ../examples
+
+cd api-hello-world
+pnpm prettier --write .
+cd ..
+
+cd www-hello-world
 pnpm prettier --write .
 cd ..

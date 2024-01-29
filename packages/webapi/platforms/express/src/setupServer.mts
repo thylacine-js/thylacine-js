@@ -3,13 +3,11 @@ import cookie_session from "cookie-session";
 import cors from "cors";
 import express, { Application, Express, RequestHandler, Request, Response, NextFunction } from "express";
 
-import setupRouter from "@thylacine-js/webapi-common/setupRouter.mjs"
-import {generateClientApiStubs} from "@thylacine-js/webapi-client/generateClient.mjs"
-
-
+import setupRouter from "@thylacine-js/webapi-common/setupRouter.mjs";
+import { generateClientApiStubs } from "@thylacine-js/webapi-client/generateClient.mjs";
 
 export default async function setupServer({ appDir = process.cwd() } = {}) {
-  const app : Express & {ws?: any} = express();
+  const app: Express & { ws?: any } = express();
 
   app.use((req, res, next) => {
     // TODO better default logging
@@ -41,8 +39,7 @@ export default async function setupServer({ appDir = process.cwd() } = {}) {
   if (!process.env.COOKIE_SECRET) {
     console.warn("WARN: COOKIE_SECRET not defined! Your cookies are insecure.");
   }
-  const COOKIE_SECRET =
-    process.env.COOKIE_SECRET || "WARNING_YOU_MUST_SET_THIS";
+  const COOKIE_SECRET = process.env.COOKIE_SECRET || "WARNING_YOU_MUST_SET_THIS";
   app.use(cookie_parser(COOKIE_SECRET));
   app.use(
     cookie_session({
@@ -53,13 +50,13 @@ export default async function setupServer({ appDir = process.cwd() } = {}) {
       path: "/",
       // httpOnly: false,
       // secure: false,
-      maxAge: null as any
+      maxAge: null as any,
     })
   );
   //expressWs(app);
-  const tree = await setupRouter(app, {appDir});
+  const tree = await setupRouter(app, { appDir });
   generateClientApiStubs(tree);
-  app.use((err: { message: any; }, req: Request, res: Response, next: NextFunction) => {
+  app.use((err: { message: any }, req: Request, res: Response, next: NextFunction) => {
     res.json({
       ok: false,
       error: err?.message,

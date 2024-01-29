@@ -212,8 +212,6 @@ export class ApiRoute<THandler extends RequestHandler | WebsocketRequestHandler>
     }
   }
 
-
-
   private constructor(
     method: HttpMethod,
     route: string,
@@ -252,7 +250,6 @@ export class ApiRoute<THandler extends RequestHandler | WebsocketRequestHandler>
               if (tc.getSymbolAtLocation(r.expression).valueDeclaration === q) {
                 console.log(r.getText());
               }
-
             }
           });
         });

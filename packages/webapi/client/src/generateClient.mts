@@ -4,7 +4,6 @@ import fs from "fs";
 import { RouteNode } from "@thylacine-js/webapi-common/apiRoute.mjs";
 
 export async function generateClientApiStubs(tree: RouteNode) {
-
   const sourceFile = ts.createSourceFile("client.ts", "", ts.ScriptTarget.ESNext, false, ts.ScriptKind.TS);
 
   const factory = ts.factory;

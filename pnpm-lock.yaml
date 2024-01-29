@@ -7,10 +7,6 @@ settings:
 importers:
 
   .:
-    dependencies:
-      typescript:
-        specifier: ^5.3.3
-        version: 5.3.3
     devDependencies:
       '@typescript-eslint/eslint-plugin':
         specifier: ^5.9.1
@@ -24,6 +20,9 @@ importers:
       prettier:
         specifier: ^3.2.4
         version: 3.2.4
+      typescript:
+        specifier: ^5.3.3
+        version: 5.3.3
 
   examples/api-hello-world:
     dependencies:
