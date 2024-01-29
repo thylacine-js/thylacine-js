@@ -19,11 +19,15 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@thylacine-js/common": "workspace:^1.0.0-alpha.0",
-    "@thylacine-js/webapi-common": "workspace:^1.0.0-alpha.0",
+    "@thylacine-js/common": "^1.0.0-alpha.0",
+    "@thylacine-js/webapi-common": "^1.0.0-alpha.0",
     "typescript": "5.3.3"
   },
   "devDependencies": {
     "typescript": "5.3.3"
-  }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "gitHead": "d954538a24856bf264e474b3fe4412921c194f55"
 }

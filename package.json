@@ -13,7 +13,7 @@
     "format": "prettier --write .",
     "start": "lerna run start",
     "version": "lerna version --no-private",
-    "publish": "lerna publish --no-private"
+    "publish": "lerna publish from-package --no-private"
   },
   "engines": {
     "node": ">=18.1.0",
