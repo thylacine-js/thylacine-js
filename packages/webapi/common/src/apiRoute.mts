@@ -16,7 +16,7 @@ import ts, {
   createLanguageService,
 } from "typescript";
 import camelCase from "lodash/camelCase.js";
-import { Dirent, readdirSync } from "node:fs";
+import { Dirent, readdirSync, statSync } from "node:fs";
 import nodePath from "node:path";
 
 import _, { create } from "lodash";
@@ -173,34 +173,27 @@ export class ApiRoute<THandler extends RequestHandler | WebsocketRequestHandler>
       const route = appendToStartIfAbsent(m[2], "/");
       let r = null;
 
-      if (!Config.LAZY_LOAD && !Config.HOT_RELOAD) {
+      if (!Config.HOT_RELOAD) {
         const module = await import(path);
         handler = module.default;
         middleware = module.middleware || [];
       } else {
-        handler = async (res: Request, req, next) => {
-          let actHandler = this.routeMap.get(res.path) as RequestHandler;
-          if (actHandler) {
-            return actHandler(res, req, next);
-          } else {
-            const module = await import(path);
-            if (module.default) actHandler = module.default;
-            this.routeMap[res.path] = actHandler;
-            return actHandler(res, req, next);
-          }
-        };
-      }
-      if (Config.HOT_RELOAD) {
         const module = await import(path);
-
         this.routeMap[path] = module.default;
+        // NOTE: if middleware changes, dev needs to restart
+        // TODO reload on changes in middleware export
         middleware = module.middleware || [];
+        handler = async (req: Request, res, next) => {
+          const mtime = statSync(path).mtime.getTime();
+          const module = await import(`file://${path}?MTIME=${mtime}`);
+          return module.default(req, res, next);
+        };
       }
       if (method !== CanonicalMethod.ws) {
         r = new ApiRoute<RequestHandler>(method, route, path, handler, middleware, parent);
-      } else r = new ApiRoute<WebsocketRequestHandler>(method, route, path, handler, middleware, parent);
-
-      // console.log(r.stringify());
+      } else {
+        r = new ApiRoute<WebsocketRequestHandler>(method, route, path, handler, middleware, parent);
+      }
       return r;
     }
     throw new Error(`Invalid path ${path}`);
