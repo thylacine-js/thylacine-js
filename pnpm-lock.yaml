@@ -76,10 +76,10 @@ importers:
   packages/webapi/client:
     dependencies:
       '@thylacine-js/common':
-        specifier: workspace:^1.0.0-alpha.0
+        specifier: ^1.0.0-alpha.1
         version: link:../../common
       '@thylacine-js/webapi-common':
-        specifier: workspace:^1.0.0-alpha.0
+        specifier: ^1.0.0-alpha.1
         version: link:../common
       typescript:
         specifier: 5.3.3
@@ -88,7 +88,7 @@ importers:
   packages/webapi/common:
     dependencies:
       '@thylacine-js/common':
-        specifier: workspace:^1.0.0-alpha.0
+        specifier: ^1.0.0-alpha.1
         version: link:../../common
       body-parser:
         specifier: ^1.20.2
@@ -164,10 +164,10 @@ importers:
   packages/webapi/platforms/express:
     dependencies:
       '@thylacine-js/webapi-client':
-        specifier: workspace:^1.0.0-alpha.0
+        specifier: ^1.0.0-alpha.1
         version: link:../../client
       '@thylacine-js/webapi-common':
-        specifier: workspace:^1.0.0-alpha.0
+        specifier: ^1.0.0-alpha.1
         version: link:../../common
       body-parser:
         specifier: ^1.20.2

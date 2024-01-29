@@ -1,6 +1,6 @@
 {
   "name": "@thylacine-js/webapi-common",
-  "version": "1.0.0-alpha.0",
+  "version": "1.0.0-alpha.1",
   "description": "Thylacine Web API Framework",
   "license": "ISC",
   "author": "",
@@ -20,7 +20,7 @@
     "lint": "eslint ./ --fix --ext .mts"
   },
   "dependencies": {
-    "@thylacine-js/common": "^1.0.0-alpha.0",
+    "@thylacine-js/common": "^1.0.0-alpha.1",
     "body-parser": "^1.20.2",
     "cookie-parser": "^1.4.6",
     "cookie-session": "^2.0.0",
