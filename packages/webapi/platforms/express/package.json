@@ -15,7 +15,7 @@
     "dist/*"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && npx prettier ./dist --write",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
