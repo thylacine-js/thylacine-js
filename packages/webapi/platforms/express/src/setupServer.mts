@@ -4,7 +4,6 @@ import cors from "cors";
 import express, { Application, Express, RequestHandler, Request, Response, NextFunction } from "express";
 
 import setupRouter from "@thylacine-js/webapi-common/setupRouter.mjs";
-import { generateClientApiStubs } from "@thylacine-js/webapi-client/generateClient.mjs";
 
 export default async function setupServer({ appDir = process.cwd() } = {}) {
   const app: Express & { ws?: any } = express();
@@ -55,7 +54,6 @@ export default async function setupServer({ appDir = process.cwd() } = {}) {
   );
   //expressWs(app);
   const tree = await setupRouter(app, { appDir });
-  generateClientApiStubs(tree);
   app.use((err: { message: any }, req: Request, res: Response, next: NextFunction) => {
     res.json({
       ok: false,
