@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import { createBrowserRouter, Outlet, ScrollRestoration } from "react-router-dom";
+import { isFunction } from "lodash";
 
 import useHMR from "./useHMR.mjs";
 
@@ -40,6 +41,9 @@ export default function createRouter(routes_list): any {
   const nested_routes = { routes: [] };
   for (const route of routes_list) {
     if (route.path) {
+      if (!isFunction(route.module)) {
+        console.warn(`Route ${route.path} is missing a default export function`);
+      }
       if (route.layout) {
         if (typeof route.layout === "string") {
           nested_routes[route.layout] ||= { routes: [] };
