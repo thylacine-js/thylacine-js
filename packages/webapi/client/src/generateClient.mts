@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import ts from "typescript";
+import ts, { ClassElement, ParameterDeclaration } from "typescript";
 import fs from "fs";
-import { RouteNode } from "@thylacine-js/webapi-common/apiRoute.mjs";
+import { ApiRoute, RouteNode } from "@thylacine-js/webapi-common/apiRoute.mjs";
 
 export async function generateClientApiStubs(tree: RouteNode) {
   const sourceFile = ts.createSourceFile("client.ts", "", ts.ScriptTarget.ESNext, false, ts.ScriptKind.TS);
@@ -62,10 +62,75 @@ export async function generateClientApiStubs(tree: RouteNode) {
             true
           )
         ),
-        ...tree.createDeclaration(),
+        ...createDeclaration(tree),
       ]
     ),
   ];
   const printer = ts.createPrinter();
   fs.writeFileSync("./apiClient.ts", printer.printFile(sourceFile));
 }
+
+function createDeclaration(route : RouteNode | ApiRoute<any>): ClassElement[] {
+    const factory = ts.factory;
+    if(route instanceof RouteNode)
+    {
+        return Array.from(route.children.values()).flatMap(createDeclaration);
+    }
+
+    return [factory.createMethodDeclaration(
+      [factory.createToken(ts.SyntaxKind.PublicKeyword), factory.createToken(ts.SyntaxKind.AsyncKeyword)],
+      undefined,
+      factory.createIdentifier(route.operation),
+      undefined,
+      undefined,
+      createParameterDeclaration(route),
+      factory.createTypeReferenceNode(factory.createIdentifier("Promise"), [
+        factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
+      ]),
+      factory.createBlock(
+        [
+          factory.createReturnStatement(
+            factory.createCallExpression(
+              factory.createPropertyAccessExpression(factory.createSuper(), factory.createIdentifier(route.method)),
+              undefined,
+              Object.keys(route.params).length > 0
+                ? [factory.createNoSubstitutionTemplateLiteral(route.interpolatedPath, route.interpolatedPath)]
+                : [factory.createStringLiteral(route.path), factory.createIdentifier("params")]
+            )
+          ),
+        ],
+        true
+      )
+    )];
+  }
+
+function createParameterDeclaration(route : ApiRoute<any>): ParameterDeclaration[] {
+    const factory = ts.factory;
+
+    if (Object.keys(route.params).length > 0) {
+      const params = [];
+      for (const key in route.params) {
+        params.push(
+          factory.createParameterDeclaration(
+            undefined,
+            undefined,
+            factory.createIdentifier(key),
+            undefined,
+            factory.createTypeReferenceNode(route.params[key]),
+            undefined
+          )
+        );
+      }
+      return params;
+    } else
+      return [
+        factory.createParameterDeclaration(
+          undefined,
+          factory.createToken(ts.SyntaxKind.DotDotDotToken),
+          factory.createIdentifier("params"),
+          undefined,
+          undefined,
+          undefined
+        ),
+      ];
+  }
