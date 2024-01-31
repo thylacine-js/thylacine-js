@@ -1,6 +1,6 @@
 {
   "name": "@thylacine-js/common",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.3",
   "description": "utils from an extinct web framework",
   "main": "index.js",
   "scripts": {
