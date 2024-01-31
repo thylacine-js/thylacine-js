@@ -11,7 +11,10 @@ export default function Page() {
           <a href="/about">/about</a>
         </li>
         <li>
-          <a href="/about">/status</a>
+          <a href="/status">/status</a>
+        </li>
+        <li>
+          <a href="/users/pradeep">/users/pradeep</a>
         </li>
       </menu>
     </div>

@@ -1,6 +1,10 @@
 import _ from "lodash";
 import { globbySync } from "globby";
 
+function bracketParamsToColonParams(path) {
+  return path.replace(/\[([^\/\\.]+)\]/g, ":$1");
+}
+
 export default async function findRouteFiles({ appDir = process.cwd() } = {}) {
   const FILE_EXTS = ["js", "jsx", "html"];
   const r = [];
@@ -11,7 +15,7 @@ export default async function findRouteFiles({ appDir = process.cwd() } = {}) {
     if (m) {
       r.push({
         class_name: `${_.startCase(m[1]).replaceAll(" ", "") || "Root"}Route`,
-        route_path: m[1],
+        route_path: bracketParamsToColonParams(m[1]),
         file_path: `${m[1]}index.${m[2]}`,
       });
     }
