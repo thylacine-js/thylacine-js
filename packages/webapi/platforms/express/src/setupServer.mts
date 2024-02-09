@@ -48,7 +48,7 @@ export default async function setupServer({ appDir = process.cwd(), validateCors
   app.use(cookie_parser(COOKIE_SECRET));
   app.use(
     cookie_session({
-      name: "session",
+      name: process.env.COOKIE_NAME || "session",
       secret: COOKIE_SECRET,
       signed: !process.env.APP_TEST,
       domain: process.env.COOKIE_DOMAIN,
