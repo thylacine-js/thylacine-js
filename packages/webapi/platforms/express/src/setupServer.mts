@@ -5,7 +5,7 @@ import express, { Application, Express, RequestHandler, Request, Response, NextF
 
 import setupRouter from "@thylacine-js/webapi-common/setupRouter.mjs";
 
-export default async function setupServer({ appDir = process.cwd() } = {}) {
+export default async function setupServer({ appDir = process.cwd(), validateCors = null } = {}) {
   const app: Express & { ws?: any } = express();
 
   app.use((req, res, next) => {
@@ -24,12 +24,18 @@ export default async function setupServer({ appDir = process.cwd() } = {}) {
           cb(null, false);
           return false;
         }
-        if (APP_ORIGIN) {
+        if (origin === APP_ORIGIN) {
           cb(null, true);
           return APP_ORIGIN;
-        } else if (API_ORIGIN) {
+        } else if (origin === API_ORIGIN) {
           cb(null, true);
           return API_ORIGIN;
+        } else if (validateCors) {
+          cb(null, validateCors(origin));
+          return false;
+        } else {
+          cb(null, false);
+          return false;
         }
       },
     })
