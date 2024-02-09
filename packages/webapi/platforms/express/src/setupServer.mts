@@ -32,7 +32,7 @@ export default async function setupServer({ appDir = process.cwd(), validateCors
           return API_ORIGIN;
         } else if (validateCors) {
           cb(null, validateCors(origin));
-          return false;
+          return origin;
         } else {
           cb(null, false);
           return false;

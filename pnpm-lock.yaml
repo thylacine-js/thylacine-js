@@ -236,6 +236,9 @@ importers:
       fastify:
         specifier: ^4.25.2
         version: 4.25.2
+      rimraf:
+        specifier: ^5.0.5
+        version: 5.0.5
 
   packages/webapp:
     dependencies:
