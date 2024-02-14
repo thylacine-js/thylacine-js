@@ -47,7 +47,8 @@
     "rimraf": "^5.0.5"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "tag": "dev"
   },
   "gitHead": "d954538a24856bf264e474b3fe4412921c194f55"
 }

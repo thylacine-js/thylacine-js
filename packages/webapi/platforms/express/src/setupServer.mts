@@ -1,19 +1,62 @@
 import cookie_parser from "cookie-parser";
 import cookie_session from "cookie-session";
 import cors from "cors";
-import express, { Application, Express, RequestHandler, Request, Response, NextFunction } from "express";
+import express, { Express, Request, Response, NextFunction, RequestHandler, ErrorRequestHandler } from "express";
 
-import setupRouter from "@thylacine-js/webapi-common/setupRouter.mjs";
+import { setupRouter } from "@thylacine-js/webapi-common";
+import { Config } from "./config.mjs";
 
 export default async function setupServer({ appDir = process.cwd(), validateCors = null } = {}) {
   const app: Express & { ws?: any } = express();
 
-  app.use((req, res, next) => {
+  addLogging(app);
+  addCORS(app);
+  addSessionHandler(app);
+  //expressWs(app);
+  await setupRouter(app, { appDir });
+  addErrorHandler(app);
+  return app;
+}
+
+function addErrorHandler(app: express.Express & { ws?: any }) {
+  return app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+    res.status(500).json({ error: err.message });
+    // res.json({
+    //   ok: false,
+    //   error: err?.message,
+    // });
+  });
+}
+
+function addSessionHandler(app: express.Express & { ws?: any }) {
+  if (!process.env.COOKIE_SECRET) {
+    console.warn("WARN: COOKIE_SECRET not defined! Your cookies are insecure.");
+  }
+
+  app.use(cookie_parser(Config.COOKIE_SECRET));
+  return app.use(
+    cookie_session({
+      name: "session",
+      secret: Config.COOKIE_SECRET,
+      signed: !process.env.APP_TEST,
+      domain: process.env.COOKIE_DOMAIN,
+      path: "/",
+      // httpOnly: false,
+      // secure: false,
+      maxAge: null,
+    })
+  );
+}
+
+function addLogging(app: express.Express & { ws?: any }) {
+  return app.use((req, res, next) => {
     // TODO better default logging
     console.log(`${req.method} ${req.path}`);
     next();
   });
-  app.use(
+}
+function addCORS(app: express.Express & { ws?: any }) {
+  return app.use(
     cors({
       credentials: true,
       origin: function (origin, cb) {

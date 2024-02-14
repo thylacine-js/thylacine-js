@@ -3,6 +3,13 @@ import ts, { ClassElement, ParameterDeclaration } from "typescript";
 import fs from "fs";
 import { ApiRoute, RouteNode } from "@thylacine-js/webapi-common/apiRoute.mjs";
 
+  function visitChildren(child: ts.Node, cb: (p: ts.Node) => void) {
+    const t = child;
+    if (t !== undefined) {
+      cb(t);
+      child.forEachChild((p) => this.visitChildren(p, cb));
+    }
+  }
 export async function generateClientApiStubs(tree: RouteNode) {
   const sourceFile = ts.createSourceFile("client.ts", "", ts.ScriptTarget.ESNext, false, ts.ScriptKind.TS);
 
@@ -106,7 +113,32 @@ function createDeclaration(route : RouteNode | ApiRoute<any>): ClassElement[] {
 
 function createParameterDeclaration(route : ApiRoute<any>): ParameterDeclaration[] {
     const factory = ts.factory;
+ const prog = ts.createProgram([this.filePath], { allowJs: true });
+ const src = prog.getSourceFile(this.filePath);
 
+ const tc = prog.getTypeChecker();
+
+ visitChildren(src, (p) => {
+   if (ts.isFunctionDeclaration(p)) {
+     //console.log((p, src, prog));
+
+     // console.log(prog.getTypeChecker().signatureToString(prog.getTypeChecker().getSignatureFromDeclaration(p)));
+     p.parameters.forEach((q) => {
+       const qs = tc.getSymbolAtLocation(q);
+
+       // console.debug(
+       //   `${q.name.getFullText()}: type is ${prog.getTypeChecker().typeToString(prog.getTypeChecker().getTypeAtLocation(q))}`
+       // );
+       visitChildren(p.body, (r) => {
+         if (ts.isPropertyAccessExpression(r)) {
+           if (tc.getSymbolAtLocation(r.expression).valueDeclaration === q) {
+             console.log(r.getText());
+           }
+         }
+       });
+     });
+   }
+ });
     if (Object.keys(route.params).length > 0) {
       const params = [];
       for (const key in route.params) {

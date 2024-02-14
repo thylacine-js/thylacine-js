@@ -4,22 +4,27 @@ import type { Express, IRouter, RequestHandler, Request as Req, Response as Resp
 import expressWs, { Application, WebsocketRequestHandler, WithWebsocketMethod } from "express-ws";
 import { METHODS } from "http";
 import { WeakExtensible } from "@thylacine-js/common/extensible.mjs";
-import { ApiRoute, CanonicalMethod, HttpMethod, RouteNode } from "./apiRoute.mjs";
-
-import ts from "typescript";
+import { RouteNode } from "./routing/RouteNode.mjs";
 
 import nodePath from "path";
+import { ApiRoute } from "./routing/ApiRoute.mjs";
+import { StandardVerbs as Verbs } from "./Method.mjs";
+import path from "path";
 
 type Request = WeakExtensible<Req>;
 type Response = WeakExtensible<Resp>;
 
 function addHandler(
-  app: IRouter,
-  method: HttpMethod,
+  app: Express,
+  method: string,
   path: string,
   handler: RequestHandler,
   ...middleware: RequestHandler[]
 ) {
+  if (method === Verbs.use) {
+    app.use(path, handler, ...middleware);
+   
+  }
   app[method](
     path,
     (req: Request, res: Response, next: NextFunction) => {
@@ -39,7 +44,7 @@ export async function addHandlersFrom(app: Express & { ws?: expressWs.WebsocketM
         if (route instanceof RouteNode) {
           await addHandlersFrom(app, route);
         } else if (route instanceof ApiRoute) {
-          if (route.method === CanonicalMethod.ws) {
+          if (route.method === Verbs.ws) {
             if (!app.ws) {
               expressWs(app);
               //TODO: pass WebSocket options
@@ -68,62 +73,4 @@ export default async function setupRouter(
   const tree = (await RouteNode.create("/", nodePath.join(appDir, "routes"))) as RouteNode;
   await addHandlersFrom(app, tree);
   return tree;
-}
-
-export async function exportClientApi(app: Express, tree: RouteNode) {
-  const methods = [];
-  const sourceFile = ts.createSourceFile("client.ts", "", ts.ScriptTarget.ESNext, false, ts.ScriptKind.TS);
-
-  const factory = ts.factory;
-  //@ts-expect-error statements can be updated
-  sourceFile.statements = [
-    factory.createClassDeclaration(
-      [factory.createToken(ts.SyntaxKind.ExportKeyword)],
-      factory.createIdentifier("Client"),
-      undefined,
-      undefined,
-      [
-        factory.createPropertyDeclaration(
-          [factory.createToken(ts.SyntaxKind.PublicKeyword), factory.createToken(ts.SyntaxKind.ReadonlyKeyword)],
-          factory.createIdentifier("baseURL"),
-          undefined,
-          factory.createTypeReferenceNode(factory.createIdentifier("URL"), undefined),
-          undefined
-        ),
-        factory.createConstructorDeclaration(
-          undefined,
-          [
-            factory.createParameterDeclaration(
-              undefined,
-              undefined,
-              factory.createIdentifier("url"),
-              undefined,
-              factory.createUnionTypeNode([
-                factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-                factory.createTypeReferenceNode(factory.createIdentifier("URL"), undefined),
-              ]),
-              undefined
-            ),
-          ],
-          factory.createBlock(
-            [
-              factory.createExpressionStatement(
-                factory.createBinaryExpression(
-                  factory.createPropertyAccessExpression(factory.createThis(), factory.createIdentifier("baseURL")),
-                  factory.createToken(ts.SyntaxKind.EqualsToken),
-                  factory.createNewExpression(factory.createIdentifier("URL"), undefined, [
-                    factory.createIdentifier("url"),
-                  ])
-                )
-              ),
-            ],
-            true
-          )
-        ),
-        ...tree.createDeclaration(),
-      ]
-    ),
-  ];
-  const printer = ts.createPrinter();
-  fs.writeFileSync("./apiClient.ts", printer.printFile(sourceFile));
 }

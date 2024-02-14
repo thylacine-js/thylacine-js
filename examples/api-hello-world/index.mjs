@@ -1,12 +1,8 @@
-import setupEnv from "@thylacine-js/common/setupEnv.mjs";
-import setupServer from "@thylacine-js/webapi-express/setupServer.mjs";
+//import  from "@thylacine-js/common/setupEnv.mjs";
+import { setupServer, Config } from "@thylacine-js/webapi-express";
 
-setupEnv();
-const server = await setupServer({
-  validateCors: (origin) => {
-    return origin === 'https://www.partner-site.example';
-  }
-});
-server.listen(process.env.API_PORT, () => {
-  console.log(`listening on ${process.env.API_ORIGIN}`);
+Config.init();
+const server = await setupServer();
+server.listen(Config.API_PORT, () => {
+  console.log(`listening on ${Config.API_ORIGIN}`);
 });
