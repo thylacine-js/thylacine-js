@@ -3,5 +3,7 @@
   "compilerOptions": {
     "outDir": "./dist/",
     "rootDir": "./src/",
+    "experimentalDecorators": true,
   },
+  "compileOnSave": true,
 }

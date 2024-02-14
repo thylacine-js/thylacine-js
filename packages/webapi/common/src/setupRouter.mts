@@ -9,8 +9,6 @@ import { RouteNode } from "./routing/RouteNode.mjs";
 import nodePath from "path";
 import { ApiRoute } from "./routing/ApiRoute.mjs";
 import { StandardVerbs as Verbs } from "./Method.mjs";
-import path from "path";
-
 type Request = WeakExtensible<Req>;
 type Response = WeakExtensible<Resp>;
 
@@ -23,7 +21,6 @@ function addHandler(
 ) {
   if (method === Verbs.use) {
     app.use(path, handler, ...middleware);
-   
   }
   app[method](
     path,
@@ -66,7 +63,7 @@ export async function addHandlersFrom(app: Express & { ws?: expressWs.WebsocketM
 
 export const HTTP_VERBS = [...METHODS, "all", "ws"];
 
-export default async function setupRouter(
+export async function mountRoutes(
   app: Express & { ws?: expressWs.WebsocketMethod<any> },
   { appDir = process.cwd() } = {}
 ): Promise<RouteNode> {

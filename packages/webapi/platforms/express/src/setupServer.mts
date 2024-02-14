@@ -3,17 +3,21 @@ import cookie_session from "cookie-session";
 import cors from "cors";
 import express, { Express, Request, Response, NextFunction, RequestHandler, ErrorRequestHandler } from "express";
 
-import { setupRouter } from "@thylacine-js/webapi-common";
+import { mountRoutes } from "@thylacine-js/webapi-common";
 import { Config } from "./config.mjs";
+import {Logging} from "@thylacine-js/webapi-common";
 
-export default async function setupServer({ appDir = process.cwd(), validateCors = null } = {}) {
+
+
+
+export default async function setupServer({ appDir = process.cwd(), validateCors = null } = {}, logger: Logging.LoggerLike = console) {
   const app: Express & { ws?: any } = express();
-
-  addLogging(app);
-  addCORS(app);
+  Logging.Logger.init(logger);
+  addLogging(app)
+  addCORS(app, validateCors);
   addSessionHandler(app);
   //expressWs(app);
-  await setupRouter(app, { appDir });
+  await mountRoutes(app, { appDir });
   addErrorHandler(app);
   return app;
 }
@@ -28,6 +32,7 @@ function addErrorHandler(app: express.Express & { ws?: any }) {
   });
 }
 
+
 function addSessionHandler(app: express.Express & { ws?: any }) {
   if (!process.env.COOKIE_SECRET) {
     console.warn("WARN: COOKIE_SECRET not defined! Your cookies are insecure.");
@@ -36,10 +41,10 @@ function addSessionHandler(app: express.Express & { ws?: any }) {
   app.use(cookie_parser(Config.COOKIE_SECRET));
   return app.use(
     cookie_session({
-      name: "session",
+      name: Config.COOKIE_NAME,
       secret: Config.COOKIE_SECRET,
       signed: !process.env.APP_TEST,
-      domain: process.env.COOKIE_DOMAIN,
+      domain: Config.COOKIE_DOMAIN,
       path: "/",
       // httpOnly: false,
       // secure: false,
@@ -55,7 +60,8 @@ function addLogging(app: express.Express & { ws?: any }) {
     next();
   });
 }
-function addCORS(app: express.Express & { ws?: any }) {
+
+function addCORS(app: express.Express & { ws?: any }, validateCors) {
   return app.use(
     cors({
       credentials: true,
@@ -84,30 +90,5 @@ function addCORS(app: express.Express & { ws?: any }) {
     })
   );
 
-  if (!process.env.COOKIE_SECRET) {
-    console.warn("WARN: COOKIE_SECRET not defined! Your cookies are insecure.");
-  }
-  const COOKIE_SECRET = process.env.COOKIE_SECRET || "WARNING_YOU_MUST_SET_THIS";
-  app.use(cookie_parser(COOKIE_SECRET));
-  app.use(
-    cookie_session({
-      name: process.env.COOKIE_NAME || "session",
-      secret: COOKIE_SECRET,
-      signed: !process.env.APP_TEST,
-      domain: process.env.COOKIE_DOMAIN,
-      path: "/",
-      // httpOnly: false,
-      // secure: false,
-      maxAge: null as any,
-    })
-  );
-  //expressWs(app);
-  const tree = await setupRouter(app, { appDir });
-  app.use((err: { message: any }, req: Request, res: Response, next: NextFunction) => {
-    res.json({
-      ok: false,
-      error: err?.message,
-    });
-  });
-  return app;
+
 }

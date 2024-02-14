@@ -12,3 +12,4 @@ declare module middleware {
 
 export { setupServer, middleware};
 export {Config} from './config.mjs';
+export {Logging} from '@thylacine-js/webapi-common'
