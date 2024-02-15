@@ -1,6 +1,6 @@
 {
   "name": "@thylacine-js/sql-migrator",
-  "version": "1.0.0-alpha.10",
+  "version": "1.0.0-alpha.11",
   "description": "sql database migrator from an extinct web framework",
   "main": "index.js",
   "scripts": {
