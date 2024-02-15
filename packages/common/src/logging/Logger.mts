@@ -1,5 +1,5 @@
 import { Console } from "console";
-import type { Logger as WinstonLogger } from "winston";
+import type { Logger as WinstonLogger, loggers } from "winston";
 import type { Logger as log4jsLogger } from "log4js";
 
 export enum Level {
@@ -15,12 +15,12 @@ function isWinstonLogger(logger: Console | WinstonLogger | log4jsLogger): logger
   return (logger as WinstonLogger).silly !== undefined;
 }
 
-export function log(level: Level = Level.info) {
+export function logMethod(level: Level = Level.info): MethodDecorator {
   return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
 
     descriptor.value = function (...args: any[]) {
-      Logger.init()[level](propertyKey, ...args);
+      Logger.instance[level](`Calling method ${propertyKey} with args: ${JSON.stringify(args)}`);
       return originalMethod.apply(this, args);
     };
     return descriptor;
@@ -36,6 +36,8 @@ export class Logger {
   error: typeof Console.prototype.error;
   debug: typeof Console.prototype.debug;
   trace: typeof Console.prototype.trace;
+
+  info: typeof Console.prototype.info;
 
   fatal: typeof Console.prototype.error;
 
@@ -60,6 +62,7 @@ export class Logger {
       this.debug = logger.debug;
       this.trace = logger.trace;
       this.fatal = logger.error;
+      this.info = logger.info;
     } else if (isWinstonLogger(logger)) {
       this.log = (message?: any, ...optionalParams: any[]) => logger.log(defaultLevel, message, ...optionalParams);
       this.warn = logger.warn;
@@ -67,6 +70,7 @@ export class Logger {
       this.debug = logger.debug;
       this.trace = (message?: any, ...optionalParams: any[]) => logger.log(Level.trace, message, ...optionalParams);
       this.fatal = (message?: any, ...optionalParams: any[]) => logger.log(Level.fatal, message, ...optionalParams);
+      this.info = logger.info;
     } else {
       this.log = logger.log;
       this.warn = logger.warn;
@@ -74,6 +78,7 @@ export class Logger {
       this.debug = logger.debug;
       this.trace = logger.trace;
       this.fatal = logger.fatal;
+      this.info = logger.info;
     }
   }
 }

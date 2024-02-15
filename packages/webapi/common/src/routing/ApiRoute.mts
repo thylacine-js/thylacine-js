@@ -12,6 +12,7 @@ import { statSync } from "node:fs";
 import _ from "lodash";
 import { RouteNode } from "./RouteNode.mjs";
 import { StandardVerbs } from "../Method.mjs";
+import { Logging } from "@thylacine-js/common";
 
 export type Verbs = StandardVerbs | string;
 
