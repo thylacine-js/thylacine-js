@@ -24,10 +24,8 @@
     "minimist": "^1.2.8"
   },
   "devDependencies": {
-    "@types/dotenv": "^8.2.0",
-    "@types/log4js": "",
-    "@types/winston": "",
     "@typescript-eslint/eslint-plugin": "^5.9.1",
+    "lerna": "^8.1.2",
     "log4js": "6.9.1",
     "prettier": "^2.5.1",
     "typescript": "^5.3.3",

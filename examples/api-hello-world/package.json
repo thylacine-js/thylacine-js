@@ -12,7 +12,10 @@
   },
   "dependencies": {
     "@thylacine-js/common": "workspace:*",
-    "@thylacine-js/webapi-express": "workspace:*",
-    "@thylacine-js/webapi-client": "workspace:*"
+    "@thylacine-js/webapi-client": "workspace:*",
+    "@thylacine-js/webapi-express": "workspace:*"
+  },
+  "devDependencies": {
+    "lerna": "^8.1.2"
   }
 }

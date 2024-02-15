@@ -29,8 +29,7 @@
     "express-ws": "^5.0.2",
     "globby": "^14.0.0",
     "lodash": "^4.17.21",
-    "multer": "1.4.5-lts.1",
-    "typescript": "^5.3.3"
+    "multer": "1.4.5-lts.1"
   },
   "devDependencies": {
     "@types/body-parser": "1.19.5",
@@ -46,11 +45,11 @@
     "@types/node": "^20.11.4",
     "@types/qs": "^6.9.11",
     "fastify": "^4.25.2",
+    "lerna": "^8.1.2",
     "typescript": "5.3.3"
   },
   "publishConfig": {
-    "access": "public",
-    "tag": "dev"
+    "access": "public"
   },
   "gitHead": "d954538a24856bf264e474b3fe4412921c194f55"
 }

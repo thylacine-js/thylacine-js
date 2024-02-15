@@ -24,6 +24,7 @@
     "typescript": "5.3.3"
   },
   "devDependencies": {
+    "lerna": "^8.1.2",
     "typescript": "5.3.3"
   },
   "publishConfig": {
