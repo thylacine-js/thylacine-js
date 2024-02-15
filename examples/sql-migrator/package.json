@@ -1,0 +1,18 @@
+{
+  "name": "sql-migrator",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "start": "node index.mjs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@thylacine-js/common": "workspace:*",
+    "@thylacine-js/sql-migrator": "workspace:*",
+    "pg": "^8.11.3"
+  }
+}

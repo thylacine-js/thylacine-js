@@ -1,0 +1,39 @@
+{
+  "name": "@thylacine-js/sql-migrator",
+  "description": "sql database migrator from an extinct web framework",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\"",
+    "build": "tsc && npx prettier ./dist --write"
+  },
+  "files": [
+    "dist",
+    "dist/*"
+  ],
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./*": "./dist/*"
+  },
+  "type": "module",
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "better-sqlite3": "^9.4.1",
+    "dotenv": "^16.3.1",
+    "dotenv-expand": "^10.0.0",
+    "minimist": "^1.2.8"
+  },
+  "devDependencies": {
+    "@types/dotenv": "^8.2.0",
+    "@types/log4js": "",
+    "@types/winston": "",
+    "@typescript-eslint/eslint-plugin": "^5.9.1",
+    "log4js": "6.9.1",
+    "prettier": "^2.5.1",
+    "typescript": "^5.3.3",
+    "winston": "^3.3.3"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
