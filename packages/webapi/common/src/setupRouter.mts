@@ -36,36 +36,37 @@ class RouteManager {
       handler
     );
   }
+  //TODO: Simplify logic here
   static async addHandlersFrom(app: Express & { ws?: expressWs.WebsocketMethod<any> }, node: RouteNode) {
-    if (node) {
-      for (const route of node.children.values()) {
-        {
-          if (route instanceof RouteNode) {
-            await RouteManager.addHandlersFrom(app, route);
-          } else if (route instanceof ApiRoute) {
-            if (route.method === Verbs.ws) {
-              if (!app.ws) {
-                expressWs(app);
-                //TODO: pass WebSocket options
-              }
-              app.ws(
-                route.path,
-                ...(route.middleware as WebsocketRequestHandler[]),
-                route.handler as WebsocketRequestHandler
-              );
-            } else {
-              const handler = catchAsyncErrors(route.handler as RequestHandler);
-              RouteManager.addHandler(
-                app,
-                route.method,
-                route.parameterizedPath,
-                handler,
-                ...(route.middleware as RequestHandler[])
-              );
-            }
-          }
+    const children: Array<ApiRoute<any> | RouteNode> = [];
+    for (const route of node.children.values()) {
+      children.push(route);
+    }
+
+    for (const route of children.filter((p) : p is ApiRoute<any> => p instanceof ApiRoute)) {
+      if (route.method === Verbs.ws) {
+        if (!app.ws) {
+          expressWs(app);
+          //TODO: pass WebSocket options
         }
+        app.ws(
+          route.path,
+          ...(route.middleware as WebsocketRequestHandler[]),
+          route.handler as WebsocketRequestHandler
+        );
+      } else {
+        const handler = catchAsyncErrors(route.handler as RequestHandler);
+        RouteManager.addHandler(
+          app,
+          route.method,
+          route.parameterizedPath,
+          handler,
+          ...(route.middleware as RequestHandler[])
+        );
       }
+    }
+    for (const route of children.filter((p) : p is RouteNode => p instanceof RouteNode)) {
+      await this.addHandlersFrom(app, route);
     }
   }
 }

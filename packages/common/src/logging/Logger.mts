@@ -31,15 +31,15 @@ export type LoggerLike = Console | WinstonLogger | log4jsLogger | Logger;
 
 export class Logger {
   _logger: Console | WinstonLogger | log4jsLogger;
-  log: typeof Console.prototype.log;
-  warn: typeof Console.prototype.warn;
-  error: typeof Console.prototype.error;
-  debug: typeof Console.prototype.debug;
-  trace: typeof Console.prototype.trace;
+  public readonly log: typeof Console.prototype.log;
+  public readonly warn: typeof Console.prototype.warn;
+  public readonly error: typeof Console.prototype.error;
+  public readonly debug: typeof Console.prototype.debug;
+  public readonly trace: typeof Console.prototype.trace;
 
-  info: typeof Console.prototype.info;
+  public readonly info: typeof Console.prototype.info;
 
-  fatal: typeof Console.prototype.error;
+  public readonly fatal: typeof Console.prototype.error;
 
   defaultLevel: Level;
 
@@ -50,9 +50,11 @@ export class Logger {
   }
   static init(logger: LoggerLike = console, defaultLevel: Level = Level.info) {
     if (logger instanceof Logger) {
-      return (Logger._instance = logger);
+      Logger._instance = logger;
+      return Logger._instance;
     }
-    return (Logger._instance = new Logger(logger, defaultLevel));
+    Logger._instance = new Logger(logger, defaultLevel);
+    return Logger._instance;
   }
   constructor(logger: Console | WinstonLogger | log4jsLogger = console, defaultLevel: Level = Level.info) {
     if (logger instanceof Console) {
@@ -80,5 +82,6 @@ export class Logger {
       this.fatal = logger.fatal;
       this.info = logger.info;
     }
+    this._logger = logger;
   }
 }

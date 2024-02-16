@@ -28,8 +28,7 @@
     "typescript": "5.3.3"
   },
   "publishConfig": {
-    "access": "public",
-    "tag": "dev"
+    "access": "public"
   },
   "gitHead": "d954538a24856bf264e474b3fe4412921c194f55"
 }
