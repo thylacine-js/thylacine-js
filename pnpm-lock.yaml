@@ -98,6 +98,9 @@ importers:
       prettier:
         specifier: ^2.5.1
         version: 2.8.8
+      rimraf:
+        specifier: ^3.0.2
+        version: 3.0.2
       typescript:
         specifier: ^5.3.3
         version: 5.3.3
@@ -138,6 +141,9 @@ importers:
       prettier:
         specifier: ^2.5.1
         version: 2.8.8
+      rimraf:
+        specifier: ^3.0.2
+        version: 3.0.2
       typescript:
         specifier: ^5.3.3
         version: 5.3.3
@@ -153,13 +159,16 @@ importers:
       '@thylacine-js/webapi-common':
         specifier: workspace:*
         version: link:../common
-      typescript:
-        specifier: 5.3.3
-        version: 5.3.3
     devDependencies:
       lerna:
         specifier: ^8.1.2
         version: 8.1.2
+      rimraf:
+        specifier: 5.0.5
+        version: 5.0.5
+      typescript:
+        specifier: 5.3.3
+        version: 5.3.3
 
   packages/webapi/common:
     dependencies:
@@ -236,6 +245,9 @@ importers:
       lerna:
         specifier: ^8.1.2
         version: 8.1.2
+      rimraf:
+        specifier: ^3.0.2
+        version: 3.0.2
       typescript:
         specifier: 5.3.3
         version: 5.3.3
@@ -6531,6 +6543,7 @@ packages:
     resolution: {integrity: sha512-pXWcraxM0uxAS+tN0AG/BF2TyqmHO014Z070UsJ+pFvYuRSq8KH8DmWpnbXe0pEPDHXZV3FcAbJkijJ5oNEnWw==}
     engines: {node: '>=14.17'}
     hasBin: true
+    dev: true
 
   /uglify-js@3.17.4:
     resolution: {integrity: sha512-T9q82TJI9e/C1TAxYvfb16xO120tMVFZrGA3f9/P4424DNu6ypK103y0GPFVa17yotwSyZW5iYXgjYHkGrJW/g==}

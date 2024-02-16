@@ -1,6 +1,6 @@
 {
   "name": "@thylacine-js/webapi-common",
-  "version": "1.0.0-alpha.11",
+  "version": "1.0.0-alpha.12",
   "description": "Thylacine Web API Framework",
   "license": "ISC",
   "author": "",
@@ -15,7 +15,7 @@
     "dist/*"
   ],
   "scripts": {
-    "build": "tsc && npx prettier ./dist --write",
+    "build": "rimraf ./dist && tsc && npx prettier ./dist --write",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint ./ --fix --ext .mts"
   },
@@ -44,6 +44,7 @@
     "@types/multer": "1.4.5",
     "@types/node": "^20.11.4",
     "@types/qs": "^6.9.11",
+    "rimraf": "^3.0.2",
     "fastify": "^4.25.2",
     "lerna": "^8.1.2",
     "typescript": "5.3.3"

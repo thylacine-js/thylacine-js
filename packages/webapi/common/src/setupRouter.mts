@@ -1,9 +1,9 @@
 import catchAsyncErrors from "./catchAsyncErrors.mjs";
 import fs from "fs";
-import type { Express, IRouter, RequestHandler, Request as Req, Response as Resp, NextFunction } from "express";
-import expressWs, { Application, WebsocketRequestHandler, WithWebsocketMethod } from "express-ws";
+import type { Express, RequestHandler, Request as Req, Response as Resp, NextFunction } from "express";
+import  expressWs, {  WebsocketRequestHandler } from "express-ws";
 import { METHODS } from "http";
-import { WeakExtensible } from "@thylacine-js/common/extensible.mjs";
+import { WeakExtensible } from "@thylacine-js/common";
 import { RouteNode } from "./routing/RouteNode.mjs";
 
 import nodePath from "path";

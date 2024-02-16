@@ -5,15 +5,15 @@ import express, { Express, Request, Response, NextFunction, RequestHandler, Erro
 
 import { mountRoutes } from "@thylacine-js/webapi-common";
 import { Config } from "./config.mjs";
-import {Logging} from "@thylacine-js/webapi-common";
+import { Logging, LoggerLike } from "@thylacine-js/webapi-common";
 
-
-
-
-export default async function setupServer({ appDir = process.cwd(), validateCors = null } = {}, logger: Logging.LoggerLike = console) {
+export default async function setupServer(
+  { appDir = process.cwd(), validateCors = null } = {},
+  logger: LoggerLike = console
+) {
   const app: Express & { ws?: any } = express();
   Logging.Logger.init(logger);
-  addLogging(app)
+  addLogging(app);
   addCORS(app, validateCors);
   addSessionHandler(app);
   //expressWs(app);
@@ -31,7 +31,6 @@ function addErrorHandler(app: express.Express & { ws?: any }) {
     // });
   });
 }
-
 
 function addSessionHandler(app: express.Express & { ws?: any }) {
   if (!process.env.COOKIE_SECRET) {
@@ -89,6 +88,4 @@ function addCORS(app: express.Express & { ws?: any }, validateCors) {
       },
     })
   );
-
-
 }

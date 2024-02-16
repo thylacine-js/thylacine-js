@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\"",
-    "build": "tsc && npx prettier ./dist --write"
+    "build": "rimraf ./dist && tsc && npx prettier ./dist --write"
   },
   "files": [
     "dist",
@@ -32,7 +32,8 @@
     "log4js": "6.9.1",
     "prettier": "^2.5.1",
     "typescript": "^5.3.3",
-    "winston": "^3.3.3"
+    "winston": "^3.3.3",
+    "rimraf": "^3.0.2"
   },
   "publishConfig": {
     "access": "public"
