@@ -27,7 +27,7 @@ export default function createConfig({ appDir = process.cwd() } = {}): BuildOpti
   return {
     entryPoints: ["app.jsx"],
     bundle: true,
-    minify: true,
+    minify: process.env.NODE_ENV === "production",
     sourcemap: "inline",
     outdir: BUILD_DIR,
     define: clientEnv,
