@@ -1,7 +1,7 @@
 import catchAsyncErrors from "./catchAsyncErrors.mjs";
 import fs from "fs";
 import type { Express, RequestHandler, Request as Req, Response as Resp, NextFunction } from "express";
-import  expressWs, {  WebsocketRequestHandler } from "express-ws";
+import expressWs, { WebsocketRequestHandler } from "express-ws";
 import { METHODS } from "http";
 import { WeakExtensible } from "@thylacine-js/common";
 import { RouteNode } from "./routing/RouteNode.mjs";
@@ -38,12 +38,13 @@ class RouteManager {
   }
   //TODO: Simplify logic here
   static async addHandlersFrom(app: Express & { ws?: expressWs.WebsocketMethod<any> }, node: RouteNode) {
-    const children: Array<ApiRoute<any> | RouteNode> = [];
-    for (const route of node.children.values()) {
-      children.push(route);
-    }
+    const children = Array.from(node.children.values());
 
-    for (const route of children.filter((p) : p is ApiRoute<any> => p instanceof ApiRoute)) {
+    for (const route of children
+      .filter((p): p is ApiRoute<any> => p instanceof ApiRoute)
+      .sort(
+        (a, b) => a.filePath.replace("use.mjs", "").length - b.filePath.replace("use.mjs", "").length
+      ) /* shortest first prioritize 'use' over other methods */) {
       if (route.method === Verbs.ws) {
         if (!app.ws) {
           expressWs(app);
@@ -65,7 +66,7 @@ class RouteManager {
         );
       }
     }
-    for (const route of children.filter((p) : p is RouteNode => p instanceof RouteNode)) {
+    for (const route of children.filter((p): p is RouteNode => p instanceof RouteNode)) {
       await this.addHandlersFrom(app, route);
     }
   }
