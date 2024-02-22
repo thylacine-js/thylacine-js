@@ -22,7 +22,7 @@ class RouteManager {
     handler: RequestHandler,
     ...middleware: RequestHandler[]
   ) {
-    if (method === Verbs.use) {
+    if (method === Verbs.before) {
       app.use(path, handler, ...middleware);
     }
     app[method](

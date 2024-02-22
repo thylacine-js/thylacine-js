@@ -9,7 +9,9 @@ export enum StandardVerbs {
   all = "all",
   ws = "ws",
   trace = "trace",
-  use = "use",
+  before = "before",
+  // TODO
+  // after = "after",
 }
 
 export type Method<p> = StandardVerbs | p extends string ? p : "get";
