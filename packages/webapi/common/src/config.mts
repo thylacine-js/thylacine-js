@@ -1,9 +1,8 @@
-import { Config as ConfigBase } from "@thylacine-js/common/config/config.mjs";
+import { Config as ConfigBase } from "@thylacine-js/common/config/Config.mjs";
 
 export class Config extends ConfigBase {
   public static init(projectPath?: string): void {
     super.init(projectPath);
-    
   }
 
   static _ROUTE_ROOT: string;
