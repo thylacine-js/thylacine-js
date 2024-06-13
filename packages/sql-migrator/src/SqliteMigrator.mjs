@@ -1,8 +1,11 @@
-import BetterSqlite3 from 'better-sqlite3';
+import BetterSqlite3 from "better-sqlite3";
 import BaseSqlMigrator from "./BaseSqlMigrator.mjs";
 
 function splitCompoundSql(sql) {
-  return sql.split(';').filter(i => !i.match(/^\s*$/)).map(s => `${s};`);
+  return sql
+    .split(";")
+    .filter((i) => !i.match(/^\s*$/))
+    .map((s) => `${s};`);
 }
 
 export default class SqliteMigrator extends BaseSqlMigrator {

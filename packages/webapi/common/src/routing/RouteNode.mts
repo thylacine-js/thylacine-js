@@ -3,7 +3,7 @@ import { trimStart } from "../config.mjs";
 import { WebsocketRequestHandler } from "express-ws";
 import { Dirent, readdirSync } from "node:fs";
 import nodePath from "node:path";
-import { ApiRoute, ParamsExp } from './ApiRoute.mjs';
+import { ApiRoute, ParamsExp } from "./ApiRoute.mjs";
 
 export class RouteNode {
   public readonly path: string;
