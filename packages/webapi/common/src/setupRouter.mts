@@ -38,7 +38,7 @@ class RouteManager {
   }
   //TODO: Simplify logic here
   static async addHandlersFrom(app: Express & { ws?: expressWs.WebsocketMethod<any> }, node: RouteNode) {
-    const children = Array.from(node.children.values());
+    const children = Array.from(node.children?.values() || [node]);
 
     for (const route of children
       .filter((p): p is ApiRoute<any> => p instanceof ApiRoute)
