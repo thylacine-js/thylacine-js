@@ -1,19 +1,22 @@
 import esbuild from "esbuild";
 import createConfig from "./lib/createConfig.mjs";
 import createProxyServer from "./lib/createProxyServer.mjs";
+import path from "path";
 
-const BUILD_DIR = process.env.APP_ENV === "production" ? "dist/production" : "dist/development";
+export default async function (webappDir = process.cwd()) {
+  const BUILD_DIR = process.env.APP_ENV === "production" ? "dist/production" : "dist/development";
 
-export default async function () {
-  const config = createConfig();
+  const config = createConfig({ appDir: webappDir });
   const ctx = await esbuild.context({ ...config });
   if (process.env.APP_ENV !== "production") {
     await ctx.watch();
     globalThis.WATCH_ENABLED = true;
   }
 
+  const servedir = path.resolve(path.join(webappDir, BUILD_DIR));
+
   const { host, port } = await ctx.serve({
-    servedir: BUILD_DIR,
+    servedir,
     onRequest: (e) => {
       console.log(`${e.status} ${e.method} ${e.path}`);
     },
@@ -25,5 +28,5 @@ export default async function () {
 
   const server = createProxyServer({ host, port, ssl, defaultPath: "/" });
   await server.listen(APP_PORT);
-  console.log(`serving at ${process.env.APP_PROTOCOL}://${APP_HOST}${APP_PORT === 80 ? "" : `:${APP_PORT}`}`);
+  console.log(`serving at ${process.env.APP_PROTOCOL || "http"}://${APP_HOST}${APP_PORT === 80 ? "" : `:${APP_PORT}`}`);
 }

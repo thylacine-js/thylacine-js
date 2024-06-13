@@ -8,6 +8,7 @@ import findRouteFiles from "./findRouteFiles.mjs";
 import findLayoutFiles from "./findLayoutFiles.mjs";
 import createRoutesInjection from "./createRoutesInjection.mjs";
 import { BuildOptions } from "esbuild";
+import path from "path";
 
 export default function createConfig({ appDir = process.cwd() } = {}): BuildOptions {
   const allowedEnvVars = ["NODE_ENV", "WWW_ORIGIN", "API_ORIGIN", "COOKIE_DOMAIN"];
@@ -20,27 +21,29 @@ export default function createConfig({ appDir = process.cwd() } = {}): BuildOpti
     }
   }
 
-  fs.ensureFileSync(`${appDir}/.temp/inject/ROUTES_LIST.mjs`);
+  const BUILD_DIR = process.env.NODE_ENV === "production" ? `${appDir}/dist/production` : `${appDir}/dist/development`;
+  const ROUTES_LIST_FILEPATH = `${BUILD_DIR}/../${process.env.NODE_ENV || "development"}-inject/ROUTES_LIST.mjs`;
+  fs.ensureFileSync(ROUTES_LIST_FILEPATH);
 
-  const BUILD_DIR = process.env.NODE_ENV === "production" ? "dist/production" : "dist/development";
+  const appJsxEntryPoint = path.resolve(path.join(appDir, "app.jsx"));
 
   return {
-    entryPoints: ["app.jsx"],
+    entryPoints: [appJsxEntryPoint],
     bundle: true,
     minify: process.env.NODE_ENV === "production",
     sourcemap: "inline",
     outdir: BUILD_DIR,
     define: clientEnv,
-    inject: ["./.temp/inject/ROUTES_LIST.mjs"],
+    inject: [ROUTES_LIST_FILEPATH],
     logLevel: "error",
     plugins: [
       esbuildOnStartBuild({
         name: "findRouteFiles",
         handler: async () => {
-          const layouts = await findLayoutFiles();
-          const routes = await findRouteFiles();
+          const layouts = await findLayoutFiles({ appDir });
+          const routes = await findRouteFiles({ appDir });
           const injection = createRoutesInjection(routes, layouts, appDir);
-          fs.writeFileSync(`./.temp/inject/ROUTES_LIST.mjs`, injection, "utf-8");
+          fs.writeFileSync(ROUTES_LIST_FILEPATH, injection, "utf-8");
         },
       }),
       esbuildOnEndBuild({
@@ -69,18 +72,18 @@ export default function createConfig({ appDir = process.cwd() } = {}): BuildOpti
             }
           }
           fs.ensureDirSync(BUILD_DIR);
-          const fps = globbySync(`./static/**`);
+          const fps = globbySync(`${appDir}/static/**`);
           for (const fp of fps) {
             handleFile(fp);
           }
           if (globalThis.WATCH_ENABLED) {
-            const watcher = chokidar.watch(`./static`, {
+            const watcher = chokidar.watch(`${appDir}/static`, {
               disableGlobbing: false,
               usePolling: true,
               interval: 500,
             });
             watcher.on("change", (fp) => {
-              handleFile(`./${fp}`);
+              handleFile(fp);
             });
           }
         },
