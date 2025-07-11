@@ -23,6 +23,6 @@
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
-    "lerna": "^8.1.2"
+    "lerna": "^8.2.2"
   }
 }

@@ -1,7 +1,7 @@
 import cookie_parser from "cookie-parser";
 import cookie_session from "cookie-session";
 import cors from "cors";
-import express, { Express, Request, Response, NextFunction, RequestHandler, ErrorRequestHandler } from "express";
+import express, { Express, Request, Response, NextFunction } from "express";
 
 import { mountRoutes } from "@thylacine-js/webapi-common";
 import { Config } from "./config.mjs";

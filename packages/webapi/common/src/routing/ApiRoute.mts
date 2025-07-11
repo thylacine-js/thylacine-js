@@ -1,18 +1,18 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { RequestHandler, Request } from "express";
+import { Request, RequestHandler } from "express";
 
-import { Config, appendToStartIfAbsent, trimStart } from "../config.mjs";
+import { Extensible } from "@thylacine-js/common/extensible.mjs";
 import { WebsocketRequestHandler } from "express-ws";
 import { METHODS } from "node:http";
-import { Extensible } from "@thylacine-js/common/extensible.mjs";
+import { Config, appendToStartIfAbsent, trimStart } from "../config.mjs";
 
 import camelCase from "lodash/camelCase.js";
 import { statSync } from "node:fs";
 
-import _ from "lodash";
-import { RouteNode } from "./RouteNode.mjs";
-import { StandardVerbs } from "../Method.mjs";
 import { Logging } from "@thylacine-js/common";
+import _ from "lodash";
+import { StandardVerbs } from "../Method.mjs";
+import { RouteNode } from "./RouteNode.mjs";
 
 export type Verbs = StandardVerbs | string;
 

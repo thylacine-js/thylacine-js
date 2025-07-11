@@ -1,15 +1,15 @@
-import catchAsyncErrors from "./catchAsyncErrors.mjs";
-import fs from "fs";
-import type { Express, RequestHandler, Request as Req, Response as Resp, NextFunction } from "express";
-import expressWs, { WebsocketRequestHandler } from "express-ws";
-import { METHODS } from "http";
 import { WeakExtensible } from "@thylacine-js/common";
+import type { Express, NextFunction, Request as Req, RequestHandler, Response as Resp } from "express";
+import expressWs, { WebsocketRequestHandler } from "express-ws";
+import fs from "fs";
+import { METHODS } from "http";
+import catchAsyncErrors from "./catchAsyncErrors.mjs";
 import { RouteNode } from "./routing/RouteNode.mjs";
 
-import nodePath from "path";
-import { ApiRoute } from "./routing/ApiRoute.mjs";
-import { StandardVerbs as Verbs } from "./Method.mjs";
 import { Logging } from "@thylacine-js/common";
+import nodePath from "path";
+import { StandardVerbs as Verbs } from "./Method.mjs";
+import { ApiRoute } from "./routing/ApiRoute.mjs";
 type Request = WeakExtensible<Req>;
 type Response = WeakExtensible<Resp>;
 
@@ -35,6 +35,7 @@ class RouteManager {
       ...middleware,
       handler
     );
+
   }
   //TODO: Simplify logic here
   static async addHandlersFrom(app: Express & { ws?: expressWs.WebsocketMethod<any> }, node: RouteNode) {

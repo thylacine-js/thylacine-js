@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import { isFunction } from "lodash";
+import { isAsyncFunction } from "util/types";
 
 function addRoutes(acc: any[], level: any, layouts: any[]) {
   for (const route of level.routes) {
@@ -28,7 +29,7 @@ export default function createRoutes(routes_list): any {
   const nested_routes = { routes: [] };
   for (const route of routes_list) {
     if (route.path) {
-      if (!isFunction(route.module)) {
+      if (!isAsyncFunction(route.module)) {
         console.warn(`Route ${route.path} is missing a default export function`);
       }
       if (route.layout) {

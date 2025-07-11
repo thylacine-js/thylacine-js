@@ -2,6 +2,7 @@ import esbuild from "esbuild";
 import createConfig from "./lib/createConfig.mjs";
 import createProxyServer from "./lib/createProxyServer.mjs";
 import path from "path";
+import { promisify } from "util";
 
 export default async function (webappDir = process.cwd()) {
   const BUILD_DIR = process.env.APP_ENV === "production" ? "dist/production" : "dist/development";
@@ -27,6 +28,6 @@ export default async function (webappDir = process.cwd()) {
   const ssl = null;
 
   const server = createProxyServer({ host, port, ssl, defaultPath: "/" });
-  await server.listen(APP_PORT);
+  await promisify(server.listen.bind(server))(APP_PORT);
   console.log(`serving at ${process.env.APP_PROTOCOL || "http"}://${APP_HOST}${APP_PORT === 80 ? "" : `:${APP_PORT}`}`);
 }

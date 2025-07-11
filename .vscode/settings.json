@@ -1,8 +1,10 @@
 {
-  "editor.formatOnSave": true,
-  "prettier.bracketSameLine": true,
-  "prettier.configPath": ".prettierrc.json",
-  "prettier.requireConfig": true,
-  "prettier.useEditorConfig": false,
-  "prettier.printWidth": 120
+	"editor.formatOnSave": true,
+	"prettier.bracketSameLine": true,
+	"prettier.configPath": ".prettierrc.json",
+	"prettier.requireConfig": true,
+	"prettier.useEditorConfig": false,
+	"prettier.printWidth": 120,
+	"typescript.tsdk": "node_modules/typescript/lib",
+	"ColorfulMonorepo.arrange.init": true
 }
