@@ -1,4 +1,4 @@
-export { Config } from "./config.mjs";
+export * as config from "./config.mjs";
 export { HTTP_VERBS, mountRoutes } from "./setupRouter.mjs";
 export { Logging, LoggerLike } from "@thylacine-js/common";
 import { WebsocketRequestHandler } from "express-ws";

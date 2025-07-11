@@ -1,8 +1,8 @@
 import { RequestHandler } from "express";
-import { trimStart } from "../config.mjs";
 import { WebsocketRequestHandler } from "express-ws";
 import { Dirent, readdirSync } from "node:fs";
 import nodePath from "node:path";
+import { trimStart } from "../config.mjs";
 import { ApiRoute, ParamsExp } from "./ApiRoute.mjs";
 
 export class RouteNode {
@@ -39,7 +39,7 @@ export class RouteNode {
     if (entries.length === 1) {
       const dirent = entries[0];
       if (dirent.isFile() && entries[0].name.endsWith(".mjs")) {
-        return await ApiRoute.create(nodePath.join(dirent.path, dirent.name), parent);
+        return await ApiRoute.create(nodePath.join(dirent.parentPath, dirent.name), parent);
       } else if (entries[0].isDirectory()) {
         return await RouteNode.create(nodePath.join(path, dirent.name), baseDirectory, parent);
       }
@@ -55,7 +55,7 @@ export class RouteNode {
             node.children.set(childNode.path, childNode);
           }
         } else if (dirent.isFile() && dirent.name.endsWith(".mjs")) {
-          node.children.set(dirent.name, await ApiRoute.create(nodePath.join(dirent.path, dirent.name), node));
+          node.children.set(dirent.name, await ApiRoute.create(nodePath.join(dirent.parentPath, dirent.name), node));
         }
       }
       return node;

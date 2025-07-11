@@ -1,4 +1,4 @@
-import dotenv from "dotenv";
+import dotenv from "@dotenvx/dotenvx";
 import dotenvExpand from "dotenv-expand";
 import fs from "fs";
 

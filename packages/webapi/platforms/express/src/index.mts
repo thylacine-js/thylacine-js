@@ -9,7 +9,7 @@ import setupServer from "./setupServer.mjs";
 //}}`
 
 export { setupServer };
-export { Config } from "./config.mjs";
+export * as config from "./config.mjs";
 
 export { Logging } from "@thylacine-js/webapi-common";
 

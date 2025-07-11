@@ -4,7 +4,7 @@ import { Request, RequestHandler } from "express";
 import { Extensible } from "@thylacine-js/common/extensible.mjs";
 import { WebsocketRequestHandler } from "express-ws";
 import { METHODS } from "node:http";
-import { Config, appendToStartIfAbsent, trimStart } from "../config.mjs";
+import Config, { appendToStartIfAbsent, trimStart } from "../config.mjs";
 
 import camelCase from "lodash/camelCase.js";
 import { statSync } from "node:fs";
@@ -16,7 +16,7 @@ import { RouteNode } from "./RouteNode.mjs";
 
 export type Verbs = StandardVerbs | string;
 
-const PathExp = new RegExp(`(.*)${Config.ROUTE_ROOT}(.*)/(.*).mjs`);
+const PathExp = new RegExp(`(.*)${Config.routeRoot}(.*)/(.*).mjs`);
 
 export const ParamsExp = /\[(\w+)\]/g;
 
@@ -91,7 +91,7 @@ export class ApiRoute<THandler extends RequestHandler | WebsocketRequestHandler>
       const route = appendToStartIfAbsent(m[2], "/");
       let r = null;
 
-      if (!Config.HOT_RELOAD) {
+      if (!Config.hotReload) {
         const module = await import(path);
         handler = module.default;
         middleware = module.middleware || [];

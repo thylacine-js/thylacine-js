@@ -1,14 +1,14 @@
+import chokidar from "chokidar";
 import fs from "fs-extra";
 import { globbySync } from "globby";
-import chokidar from "chokidar";
 
-import esbuildOnStartBuild from "./esbuildOnStartBuild.mjs";
-import esbuildOnEndBuild from "./esbuildOnEndBuild.mjs";
-import findRouteFiles from "./findRouteFiles.mjs";
-import findLayoutFiles from "./findLayoutFiles.mjs";
-import createRoutesInjection from "./createRoutesInjection.mjs";
 import { BuildOptions } from "esbuild";
 import path from "path";
+import createRoutesInjection from "./createRoutesInjection.mjs";
+import esbuildOnEndBuild from "./esbuildOnEndBuild.mjs";
+import esbuildOnStartBuild from "./esbuildOnStartBuild.mjs";
+import findLayoutFiles from "./findLayoutFiles.mjs";
+import findRouteFiles from "./findRouteFiles.mjs";
 
 export default function createConfig({ appDir = process.cwd() } = {}): BuildOptions {
   const allowedEnvVars = ["NODE_ENV", "WWW_ORIGIN", "API_ORIGIN", "COOKIE_DOMAIN"];
@@ -78,7 +78,7 @@ export default function createConfig({ appDir = process.cwd() } = {}): BuildOpti
           }
           if (globalThis.WATCH_ENABLED) {
             const watcher = chokidar.watch(`${appDir}/static`, {
-              disableGlobbing: false,
+              //disableGlobbing: false,
               usePolling: true,
               interval: 500,
             });

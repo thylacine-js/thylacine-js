@@ -1,5 +1,3 @@
-export { Config } from "@thylacine-js/config";
-export type { Env } from "@thylacine-js/config";
 export type { Extensible, WeakExtensible } from "./extensible.mjs";
 export type { LoggerLike };
 import { Level, Logger, LoggerLike, logMethod } from "@thylacine-js/logging";

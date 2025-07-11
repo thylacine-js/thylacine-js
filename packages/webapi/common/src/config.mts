@@ -1,6 +1,6 @@
-import { Config as ConfigBase } from "@thylacine-js/config";
+import { Config } from "@thylacine-js/config";
 
-export class Config extends ConfigBase {
+/* export class ConfigA extends Config {
   public static init(projectPath?: string): void {
     super.init(projectPath);
   }
@@ -8,8 +8,8 @@ export class Config extends ConfigBase {
   static _ROUTE_ROOT: string;
   public static get ROUTE_ROOT(): string {
     return (
-      Config._ROUTE_ROOT ??
-      trimEnd(appendToStartIfAbsent((Config._ROUTE_ROOT = process.env.ROUTE_ROOT ?? "/routes"), "/"), "/")
+      ConfigA._ROUTE_ROOT ??
+      trimEnd(appendToStartIfAbsent((ConfigA._ROUTE_ROOT = process.env.ROUTE_ROOT ?? "/routes"), "/"), "/")
     );
   }
 
@@ -22,7 +22,11 @@ export class Config extends ConfigBase {
       this._HOT_RELOAD ?? (this._HOT_RELOAD = Boolean(process.env.HOT_RELOAD ?? process.env.NODE_ENV === "development"))
     );
   }
-}
+} */
+
+export default Config.init<{ hotReload: boolean; routeRoot: string; lazyLoad: boolean }>({
+  projectPath: process.cwd(),
+});
 
 export function appendToEndIfAbsent(input = "", decorator: string): string {
   return input.endsWith(decorator) ? input : input + decorator;

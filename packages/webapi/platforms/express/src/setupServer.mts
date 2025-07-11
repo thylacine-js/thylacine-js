@@ -4,7 +4,7 @@ import cors from "cors";
 import express, { Express, Request, Response, NextFunction } from "express";
 
 import { mountRoutes } from "@thylacine-js/webapi-common";
-import { Config } from "./config.mjs";
+import config from "./config.mjs";
 import { Logging, LoggerLike } from "@thylacine-js/webapi-common";
 
 export default async function setupServer(
@@ -37,13 +37,13 @@ function addSessionHandler(app: express.Express & { ws?: any }) {
     console.warn("WARN: COOKIE_SECRET not defined! Your cookies are insecure.");
   }
 
-  app.use(cookie_parser(Config.COOKIE_SECRET));
+  app.use(cookie_parser(config.cookieSecret));
   return app.use(
     cookie_session({
-      name: Config.COOKIE_NAME,
-      secret: Config.COOKIE_SECRET,
-      signed: !process.env.APP_TEST,
-      domain: Config.COOKIE_DOMAIN,
+      name: config.cookieName,
+      secret: config.cookieSecret,
+      signed: !config.appTest,
+      domain: config.cookieDomain,
       path: "/",
       // httpOnly: false,
       // secure: false,
