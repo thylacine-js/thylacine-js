@@ -1,5 +1,5 @@
-import setupEnv from "@thylacine-js/common/setupEnv.mjs";
-import serve from "@thylacine-js/webapp/serve.mjs";
+import setupEnv from "@thylacine-js/common/setupEnv.js";
+import serve from "@thylacine-js/webapp/serve.js";
 
 //await setupEnv();
 await serve();

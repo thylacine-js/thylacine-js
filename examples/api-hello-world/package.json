@@ -16,6 +16,6 @@
     "@thylacine-js/webapi-express": "workspace:*"
   },
   "devDependencies": {
-    "lerna": "^8.2.2"
+    "lerna": "^8.2.3"
   }
 }

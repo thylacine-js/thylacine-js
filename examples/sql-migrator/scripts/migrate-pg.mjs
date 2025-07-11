@@ -1,4 +1,4 @@
-import PgMigrator from '@thylacine-js/sql-migrator/PgMigrator.mjs';
+import PgMigrator from '@thylacine-js/sql-migrator/PgMigrator.js';
 
 import pg from 'pg';
 
@@ -13,5 +13,5 @@ export default async function main({ steps = Infinity, down } = {}) {
   await client.end();
 }
 
-import cliCalls from '@thylacine-js/common/cliCalls.mjs';
+import cliCalls from '@thylacine-js/common/cliCalls.js';
 cliCalls(import.meta, main);

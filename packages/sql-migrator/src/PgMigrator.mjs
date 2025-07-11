@@ -1,4 +1,4 @@
-import BaseSqlMigrator from "./BaseSqlMigrator.mjs";
+import BaseSqlMigrator from "./BaseSqlMigrator.js";
 
 export default class PgMigrator extends BaseSqlMigrator {
   constructor(pgClient, migrationTableName, pgSchema = null) {

@@ -1,7 +1,7 @@
 {
-  "name": "@thylacine-js/sql-migrator",
+  "name": "@thylacine-js/config",
   "version": "1.0.0-alpha.16",
-  "description": "sql database migrator from an extinct web framework",
+  "description": "Configuration utilities for thylacine-js",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\"",
@@ -12,23 +12,21 @@
     "dist/*"
   ],
   "exports": {
-    ".": "./dist/index.mjs",
+    ".": "./dist/index.js",
     "./*": "./dist/*"
   },
   "type": "module",
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "better-sqlite3": "^12.2.0",
+    "@dotenvx/dotenvx": "^1.47.5",
     "dotenv-expand": "^12.0.2",
-    "minimist": "^1.2.8"
+    "rimraf": "^6.0.1"
   },
   "devDependencies": {
-    "log4js": "6.9.1",
     "prettier": "^3.6.2",
-    "rimraf": "^6.0.1",
-    "typescript": "^5.8.3",
-    "winston": "^3.17.0"
+    "type-fest": "^4.41.0",
+    "typescript": "^5.8.3"
   },
   "publishConfig": {
     "access": "public"

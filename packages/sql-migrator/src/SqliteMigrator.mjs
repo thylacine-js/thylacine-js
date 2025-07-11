@@ -1,5 +1,5 @@
 import BetterSqlite3 from "better-sqlite3";
-import BaseSqlMigrator from "./BaseSqlMigrator.mjs";
+import BaseSqlMigrator from "./BaseSqlMigrator.js";
 
 function splitCompoundSql(sql) {
   return sql

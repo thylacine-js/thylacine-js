@@ -1,4 +1,4 @@
-import { Config as ConfigBase } from "@thylacine-js/common/config/Config.mjs";
+import { Config as ConfigBase } from "@thylacine-js/config";
 
 export class Config extends ConfigBase {
   public static init(projectPath?: string): void {

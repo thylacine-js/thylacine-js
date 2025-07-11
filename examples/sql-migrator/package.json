@@ -13,6 +13,6 @@
   "dependencies": {
     "@thylacine-js/common": "workspace:*",
     "@thylacine-js/sql-migrator": "workspace:*",
-    "pg": "^8.15.6"
+    "pg": "^8.16.3"
   }
 }

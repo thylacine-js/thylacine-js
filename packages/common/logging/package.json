@@ -1,7 +1,7 @@
 {
-	"name": "@thylacine-js/common",
+	"name": "@thylacine-js/common-logging",
 	"version": "1.0.0-alpha.16",
-	"description": "utils from an extinct web framework",
+	"description": "Logging utilities for thylacine-js",
 	"main": "index.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\"",
@@ -18,20 +18,18 @@
 	"type": "module",
 	"author": "",
 	"license": "ISC",
-	"dependencies": {
-		"@thylacine-js/config": "workspace:*",
-		"@thylacine-js/logging": "workspace:*",
-		"dotenv-expand": "^12.0.2",
-		"minimist": "^1.2.8"
-	},
 	"devDependencies": {
-		"lerna": "^8.2.3",
+		"log4js": "6.9.1",
 		"prettier": "^3.6.2",
 		"rimraf": "^6.0.1",
-		"typescript": "^5.8.3"
+		"typescript": "^5.8.3",
+		"winston": "^3.17.0"
+	},
+	"peerDependencies": {
+		"log4js": "^6.9.1",
+		"winston": "^3.17.0"
 	},
 	"publishConfig": {
 		"access": "public"
-	},
-	"gitHead": "d954538a24856bf264e474b3fe4412921c194f55"
+	}
 }

@@ -48,6 +48,7 @@ export class Logger {
   static get instance() {
     return Logger._instance ?? Logger.init();
   }
+
   static init(logger: LoggerLike = console, defaultLevel: Level = Level.info) {
     if (logger instanceof Logger) {
       Logger._instance = logger;

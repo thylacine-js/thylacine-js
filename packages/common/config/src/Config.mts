@@ -1,6 +1,6 @@
-import fs from "fs";
 import dotenv from "dotenv";
 import dotenvExpand from "dotenv-expand";
+import fs from "fs";
 
 export class Config {
   public static init(projectPath: string = process.cwd()): void {
@@ -20,3 +20,7 @@ export class Config {
     }
   }
 }
+
+export type Env<T extends { [key: string]: any }> = {
+  [K in keyof T]: string;
+};
